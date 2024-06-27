@@ -112,7 +112,7 @@ class Engine(SignalSender, QDockWidget):
         combo_box.addItem(QCoreApplication.translate("KnitEngine", "Simulation"))
 
     def __read_portname(self) -> str:
-        return cast(str, self.ui.serial_port_dropdown.currentText())
+        return self.ui.serial_port_dropdown.currentText()
 
     def knit_config(self, image: Image.Image) -> None:
         """
