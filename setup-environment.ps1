@@ -6,9 +6,6 @@
 
 git submodule update --init --recursive
 
-# generate PySide6 types
-pyside6-genpyi all
-
 # convert Qt `.ui` files to Python code
 pyside6-uic src/main/python/main/ayab/about_gui.ui -o src/main/python/main/ayab/about_gui.py
 pyside6-uic src/main/python/main/ayab/firmware_flash_gui.ui -o src/main/python/main/ayab/firmware_flash_gui.py
