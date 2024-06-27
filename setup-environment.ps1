@@ -36,6 +36,4 @@ pyside6-rcc src/main/python/main/ayab/engine/lowercase_e_rc.qrc -o src/main/pyth
 pyside6-rcc src/main/python/main/ayab/engine/lowercase_e_reversed_rc.qrc -o src/main/python/main/ayab/engine/lowercase_e_reversed_rc.py
 
 # generate translation files
-cd src/main/resources/base/ayab/translations/
-perl ayab_trans.pl
-cd ../../../../../../
+python ./src/main/resources/base/ayab/translations/ayab_trans.py
