@@ -68,7 +68,7 @@ class GuiMain(QMainWindow):
 
         # create UI
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # type: ignore[no-untyped-call]
 
         # add modular components
         self.menu = Menu(self)

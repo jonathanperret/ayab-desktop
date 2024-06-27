@@ -39,7 +39,7 @@ class Menu(QMenuBar):
     def __init__(self, parent: GuiMain):
         super().__init__(parent)
         self.ui = Ui_MenuBar()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # type: ignore[no-untyped-call]
         self.setup()
 
     def setup(self) -> None:
