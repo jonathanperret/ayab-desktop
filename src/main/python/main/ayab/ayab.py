@@ -20,7 +20,6 @@
 """Provides a graphical interface for users to operate AYAB."""
 
 from __future__ import annotations
-import sys
 import logging
 
 from PySide6.QtWidgets import QMainWindow
@@ -100,6 +99,16 @@ class GuiMain(QMainWindow):
         self.fsm.set_properties(self)
         self.fsm.machine.start()
 
+        instance = QCoreApplication.instance()
+        if instance is not None:
+            instance.aboutToQuit.connect(self.__cleanup)
+
+    def __cleanup(self) -> None:
+        self.engine.cancel()
+
+        self.knit_thread.wait()
+        self.test_thread.wait()
+
     def __activate_ui(self) -> None:
         self.ui.open_image_file_button.clicked.connect(self.scene.ayabimage.select_file)
         self.ui.filename_lineedit.returnPressed.connect(
@@ -135,7 +144,6 @@ class GuiMain(QMainWindow):
         instance = QCoreApplication.instance()
         if instance is not None:
             instance.quit()
-        sys.exit()
 
     def start_knitting(self) -> None:
         """Start the knitting process."""

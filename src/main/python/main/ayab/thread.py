@@ -32,9 +32,6 @@ class GenericThread(QThread):
         self.args = args
         self.kwargs = kwargs
 
-    def __del__(self) -> None:
-        self.wait()
-
     def run(self) -> None:
         try:
             self.function(*self.args, **self.kwargs)
