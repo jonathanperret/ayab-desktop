@@ -69,7 +69,6 @@ Activate the virtual environment. The command prompt should now display
 ```
 (You may skip the virtual environment setup below.)
 
-You will also need to download and install Perl from [https://www.perl.org/get.html](https://www.perl.org/get.html).
 </details>
 
 <details>
