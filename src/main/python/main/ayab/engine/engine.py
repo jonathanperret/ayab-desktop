@@ -58,7 +58,7 @@ class Engine(SignalSender, QDockWidget):
         # set up UI
         super().__init__(parent.signal_receiver)
         self.ui = Ui_Dock()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # type: ignore[no-untyped-call]
         self.config: OptionsTab = OptionsTab(parent)
         self.config.portname = self.__read_portname()
         self.config.refresh()
@@ -112,7 +112,7 @@ class Engine(SignalSender, QDockWidget):
         combo_box.addItem(QCoreApplication.translate("KnitEngine", "Simulation"))
 
     def __read_portname(self) -> str:
-        return self.ui.serial_port_dropdown.currentText()
+        return cast(str, self.ui.serial_port_dropdown.currentText())
 
     def knit_config(self, image: Image.Image) -> None:
         """

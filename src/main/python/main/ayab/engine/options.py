@@ -88,7 +88,7 @@ class OptionsTab(SignalSender, QWidget):
         # self.__reset()
 
     def __setup_ui(self) -> None:
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # type: ignore[no-untyped-call]
 
         # Combo boxes
         Mode.add_items(self.ui.knitting_mode_box)
