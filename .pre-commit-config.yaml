@@ -18,4 +18,4 @@ repos:
       hooks:
       -   id: mypy
           args: [--config-file=.pre-commit.mypy.ini]
-          additional_dependencies: [numpy]
+          additional_dependencies: [numpy, PySide6]
