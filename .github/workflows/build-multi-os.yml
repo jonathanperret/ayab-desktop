@@ -250,9 +250,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
           python -m pip install -r requirements.build.txt
+
       - name: Convert UI and translation files
         run: |
-          cd squashfs-root
           bash setup-environment.ps1
 
       - name: Relocate
