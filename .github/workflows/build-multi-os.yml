@@ -55,6 +55,11 @@ jobs:
           submodules: recursive
       - uses: ./.github/actions/init-environment
         id: vars
+      - name: Get firmware version matching manifest
+        shell: bash
+        run: |
+          cd src/main/resources/base/ayab/firmware/
+          curl -O ${{ steps.vars.outputs.firmware-url }}
       - name: Install dependencies
         shell: pwsh
         run: |
@@ -64,11 +69,6 @@ jobs:
           python -m pip install --upgrade setuptools
           python -m pip install -r requirements.build.txt
           python -m pip install -r windows-build\windows_build_requirements.txt
-      - name: Get firmware version matching manifest
-        shell: bash
-        run: |
-          cd src/main/resources/base/ayab/firmware/
-          curl -O ${{ steps.vars.outputs.firmware-url }}
       - name: Convert UI and translation files
         run: |
           bash setup-environment.ps1
@@ -134,6 +134,11 @@ jobs:
           submodules: recursive
       - uses: ./.github/actions/init-environment
         id: vars
+      - name: Get firmware version matching manifest
+        shell: bash
+        run: |
+          cd src/main/resources/base/ayab/firmware/
+          curl -O ${{ steps.vars.outputs.firmware-url }}
       - name: Install dependencies
         shell: zsh {0}
         run: |
@@ -157,21 +162,6 @@ jobs:
           python -m pip install tmp-wheel/*.whl bitarray*.whl
 
           python -m pip install --no-binary charset_normalizer -r requirements.build.txt
-      - name: Get firmware version matching manifest
-        run: |
-          echo ${{ steps.vars.outputs.manifest }}
-          available=$(curl -s https://github.com/AllYarnsAreBeautiful/ayab-firmware/releases | grep -oE '/tag/[^\"]+' | sed -E 's/\/tag\///')
-          echo $available
-          match=$(for x in $available; do echo $x; done | grep ^${{ steps.vars.outputs.manifest }} | sort -r | head -1)
-          echo $match
-          if [[ $match ]]
-          then
-            cd src/main/resources/base/ayab/firmware/
-            wget https://github.com/AllYarnsAreBeautiful/ayab-firmware/releases/download/$match/ayab_monolithic_uno.hex
-          else
-            echo "Error: could not find firmware release matching manifest"
-            exit 1
-          fi
       - name: Convert UI and translation files
         run: |
           bash setup-environment.ps1
@@ -229,20 +219,10 @@ jobs:
         id: vars
 
       - name: Get firmware version matching manifest
+        shell: bash
         run: |
-          echo ${{ steps.vars.outputs.manifest }}
-          available=$(curl -s https://github.com/AllYarnsAreBeautiful/ayab-firmware/releases | grep -oE '/tag/[^\"]+' | sed -E 's/\/tag\///')
-          echo $available
-          match=$(for x in $available; do echo $x; done | grep ^${{ steps.vars.outputs.manifest }} | sort -r | head -1)
-          echo $match
-          if [[ $match ]]
-          then
-            cd src/main/resources/base/ayab/firmware/
-            wget https://github.com/AllYarnsAreBeautiful/ayab-firmware/releases/download/$match/ayab_monolithic_uno.hex
-          else
-            echo "Error: could not find firmware release matching manifest"
-            exit 1
-          fi
+          cd src/main/resources/base/ayab/firmware/
+          curl -O ${{ steps.vars.outputs.firmware-url }}
 
       - name: Install Python modules
         run: |
