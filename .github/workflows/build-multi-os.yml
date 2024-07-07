@@ -68,7 +68,7 @@ jobs:
         shell: bash
         run: |
           cd src/main/resources/base/ayab/firmware/
-          wget {{ steps.vars.outputs.firmware_url }}
+          curl -O {{ steps.vars.outputs.firmware_url }}
       - name: Convert UI and translation files
         run: |
           bash setup-environment.ps1
