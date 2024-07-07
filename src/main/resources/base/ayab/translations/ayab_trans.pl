@@ -89,5 +89,5 @@ HEADER
 # now that the `.ts` files have been generated
 # run `lrelease *.ts` to create binary `.qm` files
 open(FILE, "<", $master);
-system("lrelease *.ts");
+system("pyside6-lrelease *.ts");
 unlink glob "*.ts";
