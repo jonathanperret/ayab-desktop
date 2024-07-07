@@ -63,7 +63,6 @@ jobs:
       - name: Install dependencies
         shell: pwsh
         run: |
-          choco install patch
           choco install vcredist-all # fixes dependency on msvcr100.dll
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
