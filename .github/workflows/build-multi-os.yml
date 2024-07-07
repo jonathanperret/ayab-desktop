@@ -296,7 +296,6 @@ jobs:
 
   build-macos:
     name: Create and upload Mac OSX release
-    needs: setup
     runs-on: macos-14
     strategy:
       matrix:
@@ -331,56 +330,25 @@ jobs:
           python -m pip install tmp-wheel/*.whl bitarray*.whl
 
           python -m pip install --no-binary charset_normalizer -r requirements.build.txt
-      - name: Restore cached firmware
-        id: firmware-cache
-        uses: actions/cache@v3
-        with:
-          path: src/main/resources/base/ayab/firmware/*.hex
-          key: firmware-${{ steps.vars.outputs.manifest }}
-          fail-on-cache-miss: true
-      - name: Restore cached gui files (1)
-        id: gui1-cache
-        uses: actions/cache@v3
-        with:
-          path: src/main/python/main/ayab/*_gui.py
-          key: gui1-${{ hashFiles('src/main/python/main/ayab/*_gui.ui') }}
-          fail-on-cache-miss: true
-      - name: Restore cached gui files (2)
-        id: gui2-cache
-        uses: actions/cache@v3
-        with:
-          path: src/main/python/main/ayab/engine/*_gui.py
-          key: gui2-${{ hashFiles('src/main/python/main/ayab/engine/*_gui.ui') }}
-          fail-on-cache-miss: true
-      - name: Restore cached logo
-        id: logo-cache
-        uses: actions/cache@v3
-        with:
-          path: src/main/python/main/ayab/ayab_logo_rc.py
-          key: logo-${{ hashFiles('src/main/python/main/ayab/ayab_logo_rc.qrc') }}
-          fail-on-cache-miss: true
-      - name: Restore cached graphics
-        id: e-cache
-        uses: actions/cache@v3
-        with:
-          path: src/main/python/main/ayab/engine/*_rc.py
-          key: e-${{ hashFiles('src/main/python/main/ayab/engine/*_rc.qrc') }}
-          fail-on-cache-miss: true
-      - name: Restore cached translation files
-        id: qm-cache
-        uses: actions/cache@v3
-        with:
-          path: src/main/resources/base/ayab/translations/*.qm
-          key: qm-${{ hashFiles('src/main/resources/base/ayab/translations/ayab-translation-master.tsv') }}
-          fail-on-cache-miss: true
-      - name: Restore cached `base.json` file
-        id: base-cache
-        uses: actions/cache@v3
-        with:
-          path: src/build/settings/base.json
-          key: base-${{ steps.vars.outputs.tag }}
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
+      - name: Get firmware version matching manifest
+        run: |
+          echo ${{ steps.vars.outputs.manifest }}
+          available=$(curl -s https://github.com/AllYarnsAreBeautiful/ayab-firmware/releases | grep -oE '/tag/[^\"]+' | sed -E 's/\/tag\///')
+          echo $available
+          match=$(for x in $available; do echo $x; done | grep ^${{ steps.vars.outputs.manifest }} | sort -r | head -1)
+          echo $match
+          if [[ $match ]]
+          then
+            cd src/main/resources/base/ayab/firmware/
+            wget https://github.com/AllYarnsAreBeautiful/ayab-firmware/releases/download/$match/ayab_monolithic_uno.hex
+          else
+            echo "Error: could not find firmware release matching manifest"
+            exit 1
+          fi
+      - name: Convert UI and translation files
+        run: |
+          sudo apt install -y qt6-base-dev qt6-tools-dev-tools qt6-l10n-tools
+          PATH=/usr/lib/qt6/bin:$PATH bash setup-environment.ps1
       - name: Remove unneeded files
         run: |
           rm src/main/python/main/ayab/*_gui.ui
