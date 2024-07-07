@@ -116,7 +116,7 @@ jobs:
           artifacts: target/AYAB-${{ steps.vars.outputs.tag }}.exe
           artifactContentType: application/exe
           replacesArtifacts: true
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: AYAB-${{ steps.vars.outputs.tag }}.exe
           path: target/AYAB-${{ steps.vars.outputs.tag }}.exe
@@ -207,7 +207,7 @@ jobs:
           artifacts: target/AYAB-${{ steps.vars.outputs.tag }}.dmg
           artifactContentType: application/dmg
           replacesArtifacts: true
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: AYAB-${{ steps.vars.outputs.tag }}.dmg
           path: target/AYAB-${{ steps.vars.outputs.tag }}.dmg
@@ -343,7 +343,7 @@ jobs:
           artifacts: AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
           artifactContentType: application/AppImage
           replacesArtifacts: true
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
           path: AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
