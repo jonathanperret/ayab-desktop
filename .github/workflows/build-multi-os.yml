@@ -310,8 +310,8 @@ jobs:
       - name: Install dependencies
         shell: zsh {0}
         run: |
-          brew install avrdude
-          brew install qt
+          # brew install avrdude
+          # brew install qt
           mkdir tmp-wheel/
           python -m pip install delocate
 
@@ -347,8 +347,9 @@ jobs:
           fi
       - name: Convert UI and translation files
         run: |
-          sudo apt install -y qt6-base-dev qt6-tools-dev-tools qt6-l10n-tools
-          PATH=/usr/lib/qt6/bin:$PATH bash setup-environment.ps1
+          # sudo apt install -y qt6-base-dev qt6-tools-dev-tools qt6-l10n-tools
+          # PATH=/usr/lib/qt6/bin:$PATH 
+          bash setup-environment.ps1
       - name: Remove unneeded files
         run: |
           rm src/main/python/main/ayab/*_gui.ui
