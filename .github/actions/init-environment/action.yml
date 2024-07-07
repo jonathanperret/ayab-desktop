@@ -12,6 +12,8 @@ outputs:
     value: ${{steps.vars.outputs.python}}
   python-appimage:
     value: ${{steps.vars.outputs.python-appimage}}
+  firmware-url:
+    value: ${{steps.vars.outputs.firmware-url}}
 runs:
   using: "composite"
   steps:
@@ -38,7 +40,7 @@ runs:
         then
           cd src/main/resources/base/ayab/firmware/
           url=https://github.com/AllYarnsAreBeautiful/ayab-firmware/releases/download/$match/ayab_monolithic_uno.hex
-          echo "firmware_url=${url}" >> $GITHUB_OUTPUT
+          echo "firmware-url=${url}" >> $GITHUB_OUTPUT
         else
           echo "Error: could not find firmware release matching manifest"
           exit 1
