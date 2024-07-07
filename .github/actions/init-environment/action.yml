@@ -13,7 +13,7 @@ outputs:
   python-appimage:
     value: ${{steps.vars.outputs.python-appimage}}
   firmware-url:
-    value: ${{steps.vars.outputs.firmware-url}}
+    value: ${{steps.firmware.outputs.firmware-url}}
 runs:
   using: "composite"
   steps:
@@ -29,6 +29,7 @@ runs:
         echo "python-appimage=python${{matrix.python-version}}.9-cp311-cp311-manylinux_2_28_x86_64.AppImage" >> $GITHUB_OUTPUT
 
     - name: Get firmware version matching manifest
+      id: firmware
       shell: bash
       run: |
         echo ${{ steps.vars.outputs.manifest }}

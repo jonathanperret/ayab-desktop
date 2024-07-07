@@ -215,6 +215,7 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+
       - uses: ./.github/actions/init-environment
         id: vars
 
