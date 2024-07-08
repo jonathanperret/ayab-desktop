@@ -93,7 +93,9 @@ class Communication(object):
         if not self.__ser:
             self.__portname = portname
             try:
-                self.__ser = serial.Serial(self.__portname, 115200, timeout=0.1)
+                self.__ser = serial.Serial(
+                    self.__portname, 115200, timeout=0.1, exclusive=True
+                )
             except Exception:
                 self.logger.error(f"could not open serial port {self.__portname}")
                 raise CommunicationException()
