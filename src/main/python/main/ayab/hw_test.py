@@ -133,10 +133,7 @@ class HardwareTestDialog(QDialog):
 
     def reject(self):
         # send quitCmd
-        payload = bytearray()
-        token = Token.quitCmd.value
-        payload.append(token)
-        self.__control.com.write_API6(payload)
+        self.__control.com.write_API6([Token.quitCmd.value])
         self.__control.state = State.FINISHED
         # reset dialog
         self._autoRead_button.setChecked(False)

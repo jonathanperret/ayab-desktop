@@ -42,7 +42,8 @@ class HardwareTestCommunicationMock(QObject, CommunicationMock):
         self.__output(Token.testRes, "AYAB Hardware Test v1.0 API v6\n\n")
         self._handle_helpCmd(bytes())
 
-    def write_API6(self, msg: bytes) -> None:
+    def write_API6(self, msg: bytes | bytearray | list[int]) -> None:
+        msg = bytes(msg)
         token = msg[0]
         try:
             i = [t.value for t in self.__tokens].index(token)

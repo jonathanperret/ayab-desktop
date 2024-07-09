@@ -119,17 +119,11 @@ class Communication(object):
     # NB this method must be the same for all API versions
     def req_info(self) -> None:
         """Send a request for information to the device."""
-        if self.__ser is None:
-            return
-        data = self.__driver.send(bytes([Token.reqInfo.value]))
-        self.__ser.write(data)
+        self.write_API6([Token.reqInfo.value])
 
     def req_test_API6(self) -> None:
         """Send a request for testing to the device."""
-        if self.__ser is None:
-            return
-        data = self.__driver.send(bytes([Token.reqTest.value]))
-        self.__ser.write(data)
+        self.write_API6([Token.reqTest.value])
 
     def req_start_API6(
         self,
@@ -149,8 +143,7 @@ class Communication(object):
         hash = 0
         hash = add_crc(hash, data)
         data.append(hash)
-        data = self.__driver.send(bytes(data))
-        self.__ser.write(data)
+        self.write_API6(data)
 
     def req_init_API6(self, machine: Machine) -> None:
         """Send a start message to the device."""
@@ -162,8 +155,7 @@ class Communication(object):
         hash = 0
         hash = add_crc(hash, data)
         data.append(hash)
-        data = self.__driver.send(bytes(data))
-        self.__ser.write(data)
+        self.write_API6(data)
 
     def cnf_line_API6(
         self, line_number: int, color: int, flags: int, line_data: bytes
@@ -193,8 +185,7 @@ class Communication(object):
         hash = 0
         hash = add_crc(hash, data)
         data.append(hash)
-        data = self.__driver.send(bytes(data))
-        self.__ser.write(data)
+        self.write_API6(data)
 
     def update_API6(self) -> tuple[bytes | None, Token, int]:
         """Read data from serial and parse as SLIP packet."""
@@ -244,7 +235,7 @@ class Communication(object):
 
         return None
 
-    def write_API6(self, msg: bytes | bytearray) -> None:
+    def write_API6(self, msg: bytes | bytearray | list[int]) -> None:
         if self.__ser is None:
             return
         data = self.__driver.send(bytes(msg))
