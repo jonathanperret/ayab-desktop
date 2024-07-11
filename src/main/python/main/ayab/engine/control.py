@@ -75,7 +75,18 @@ class Control(SignalSender):
     start_needle: int
     start_pixel: int
     start_row: int
-    state: State
+
+    _state: State
+
+    @property
+    def state(self) -> State:
+        return self._state
+
+    @state.setter
+    def state(self, value: State) -> None:
+        self.logger.debug("Entering state %s", value)
+        self._state = value
+
     logger: logging.Logger
 
     def __init__(self, parent: GuiMain, engine: Engine):
