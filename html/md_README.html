@@ -78,18 +78,15 @@ Running from Source &amp; Development</h1>
 <h2><a class="anchor" id="autotoc_md31"></a>
 Platform-Specific Setup</h2>
 <p>&lt;details&gt;</p>
-<p>For flashing the firmware, avrdude has to be available on your system. <br  />
- To be able to work on GUI elements and translation files, you will also need Qt Dev &amp; Localization Tools. </p>
+<p>For flashing the firmware, avrdude has to be available on your system.</p>
 <h3><a class="anchor" id="autotoc_md32"></a>
 Debian/Ubuntu</h3>
 <div class="fragment"><div class="line">sudo apt install python3.11 python3.11-dev python3.11-venv</div>
-<div class="line">sudo apt install libasound2-dev avrdude qt6-tools-dev-tools build-essential qt6-l10n-tools</div>
-<div class="line">export PATH=/usr/lib/qt6/bin:$PATH</div>
+<div class="line">sudo apt install libasound2-dev avrdude</div>
 </div><!-- fragment --> <h3><a class="anchor" id="autotoc_md33"></a>
 openSUSE</h3>
 <div class="fragment"><div class="line">sudo zypper install python311 python311-pip python311-virtualenv python311-devel</div>
-<div class="line">sudo zypper install libasound2 alsa-devel avrdude qt6-tools qt6-tools-linguist</div>
-<div class="line">export PATH=/usr/lib/qt6/bin:$PATH </div>
+<div class="line">sudo zypper install libasound2 alsa-devel avrdude</div>
 </div><!-- fragment --> <h3><a class="anchor" id="autotoc_md34"></a>
 All Distributions</h3>
 <p>To be able to communicate with your Arduino, it might be necessary to add the rights for USB communication by adding your user to some groups. </p><div class="fragment"><div class="line">sudo usermod -aG tty [userName]</div>
@@ -104,13 +101,11 @@ All Distributions</h3>
 </div><!-- fragment --><p> Next, create a virtual environment for AYAB: </p><div class="fragment"><div class="line">conda create --name ayab -c conda-forge python=3.11 pip</div>
 </div><!-- fragment --><p> Activate the virtual environment. The command prompt should now display <code>(ayab)</code> at the beginning of each line. </p><div class="fragment"><div class="line">conda activate ayab</div>
 </div><!-- fragment --><p> (You may skip the virtual environment setup below.)</p>
-<p>To be able to work on GUI elements and translation files, the Qt Dev tools are needed. <br  />
- Navigate to <a href="https://www.qt.io/download-open-source">https://www.qt.io/download-open-source</a> in a web browser and follow the installation instructions. From the available options, select "Custom install" and then "Qt 6.6.3". You will also need to download and install Perl from <a href="https://www.perl.org/get.html">https://www.perl.org/get.html</a>. &lt;/details&gt;</p>
+<p>You will also need to download and install Perl from <a href="https://www.perl.org/get.html">https://www.perl.org/get.html</a>. &lt;/details&gt;</p>
 <p>&lt;details&gt;</p>
 <p>macOS</p>
 <p>You can install Git using Homebrew: </p><div class="fragment"><div class="line">brew install git</div>
 </div><!-- fragment --><p> You will also need the Xcode command line tools: </p><div class="fragment"><div class="line">xcode-select --install</div>
-</div><!-- fragment --><p> To be able to work on GUI elements and translation files, the Qt Dev tools are needed also: </p><div class="fragment"><div class="line">brew install qt</div>
 </div><!-- fragment --><p> Install python from <a href="https://www.python.org/ftp/python/3.11.8/python-3.11.8-macos11.pkg">the official universal2 installer</a>. (Conda does not produce universal binaries) <br  />
 </p>
 <p>If you encounter the pip <code>SSL:TLSV1_ALERT_PROTOCOL_VERSION</code> problem: </p><div class="fragment"><div class="line">curl https://bootstrap.pypa.io/get-pip.py | python</div>
@@ -125,8 +120,7 @@ Universal Setup Steps</h2>
 <div class="line">pip install --upgrade setuptools</div>
 <div class="line">pip install -r requirements.txt</div>
 </div><!-- fragment --><p>Next, convert the PySide6 <code>.ui</code> files and generate the translation files: </p><div class="fragment"><div class="line">bash ./setup-environment.ps1</div>
-</div><!-- fragment --><p> If you get errors about missing <code>lrelease</code>, you can skip this (if you do not need the translation files). To do so, comment out lines [23:26] of <code>setup-environment.ps1</code>.</p>
-<p>Finally, you can start AYAB with </p><div class="fragment"><div class="line">fbs run</div>
+</div><!-- fragment --><p>Finally, you can start AYAB with </p><div class="fragment"><div class="line">fbs run</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md36"></a>
 CI/CD on GitHub</h1>
 <h2><a class="anchor" id="autotoc_md37"></a>
