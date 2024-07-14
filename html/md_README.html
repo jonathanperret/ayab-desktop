@@ -78,15 +78,15 @@ Running from Source &amp; Development</h1>
 <h2><a class="anchor" id="autotoc_md31"></a>
 Platform-Specific Setup</h2>
 <p>&lt;details&gt;</p>
-<p>For flashing the firmware, avrdude has to be available on your system.</p>
+<p>For flashing the firmware, avrdude has to be available on your system. To build or run the application, you will also need the system libraries required by Qt 6; installing the Qt 6 development tools is a concise (if heavy-handed) way of bringing in these dependencies.</p>
 <h3><a class="anchor" id="autotoc_md32"></a>
 Debian/Ubuntu</h3>
 <div class="fragment"><div class="line">sudo apt install python3.11 python3.11-dev python3.11-venv</div>
-<div class="line">sudo apt install libasound2-dev avrdude</div>
+<div class="line">sudo apt install libasound2-dev avrdude qt6-tools-dev-tools build-essential</div>
 </div><!-- fragment --> <h3><a class="anchor" id="autotoc_md33"></a>
 openSUSE</h3>
 <div class="fragment"><div class="line">sudo zypper install python311 python311-pip python311-virtualenv python311-devel</div>
-<div class="line">sudo zypper install libasound2 alsa-devel avrdude</div>
+<div class="line">sudo zypper install libasound2 alsa-devel avrdude qt6-tools-dev-tools build-essential</div>
 </div><!-- fragment --> <h3><a class="anchor" id="autotoc_md34"></a>
 All Distributions</h3>
 <p>To be able to communicate with your Arduino, it might be necessary to add the rights for USB communication by adding your user to some groups. </p><div class="fragment"><div class="line">sudo usermod -aG tty [userName]</div>
