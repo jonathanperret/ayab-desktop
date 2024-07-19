@@ -23,7 +23,6 @@ from __future__ import annotations
 from enum import Enum, auto
 
 from PySide6.QtCore import QCoreApplication
-from PySide6.QtStateMachine import QStateMachine, QState
 
 from .communication import Communication, Token
 from .communication_mock import CommunicationMock
@@ -33,7 +32,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .control import Control
-    from .engine import Engine
 
 
 class Operation(Enum):
@@ -54,24 +52,14 @@ class State(Enum):
     FINISHED = auto()
 
 
-class StateMachine(QStateMachine):
+class StateMachine:
     """
-        Each method is a step in the finite state machine that governs serial
-    M
-        communication with the device and is called only by `Control.operate()`
+    Each method is a step in the finite state machine that governs serial
+    communication with the device and is called only by `Control.operate()`
 
-        @author Tom Price
-        @date   June 2020
+    @author Tom Price
+    @date   June 2020
     """
-
-    CONNECT: QState
-    VERSION_CHECK: QState
-
-    def set_transitions(self, parent: Engine) -> None:
-        """Define transitions between states for Finite State Machine"""
-
-        # Events that trigger state changes
-        self.CONNECT.addTransition(parent.port_opener, self.VERSION_CHECK)
 
     @staticmethod
     def _API6_connect(control: Control, operation: Operation) -> Output:
