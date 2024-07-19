@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.11.9
-ARG PYSIDE_VERSION=6.6.2
+ARG PYSIDE_VERSION=6.6.1
 
 FROM ubuntu:22.04 AS python-build
 
@@ -59,20 +59,24 @@ FROM ayab-base AS ayab-local
 COPY requirements*.txt /ayab
 
 COPY src /ayab/src
-COPY mypy.ini /ayab/
+COPY mypy.ini setup-environment.ps1 /ayab/
 
 FROM ayab-base AS ayab-github
 
 #RUN git clone -b 1.0.0-dev https://github.com/AllYarnsAreBeautiful/ayab-desktop /ayab
 RUN git clone -b misc-fixes https://github.com/jonathanperret/ayab-desktop /ayab
 
-FROM ayab-github AS ayab-test
+RUN git submodule update --init --recursive
+
+FROM ayab-local AS ayab-test
 
 ARG PYSIDE_VERSION
 
 RUN sed -i -E "s/^PySide6==.*/PySide6==${PYSIDE_VERSION}/" requirements.build.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r requirements.txt
+
+RUN ln -s pyside6-lrelease /tmp/venv/bin/lrelease
 
 # Qt6 system dependencies
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -103,11 +107,22 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN ln -s libwebp.so.7 /usr/lib/$(uname -i)-linux-gnu/libwebp.so.6
 # RUN pyside6-genpyi all
 
-RUN cat setup-environment.ps1 | grep -v genpyi | bash -x
+RUN cat setup-environment.ps1 | grep -v genpyi | grep -v submodule | bash -x
 
 RUN mypy src
 
 RUN sed -i -e s/PACKAGE_VERSION/1.0.0/ src/build/settings/base.json
 
-ENV QT_QPA_PLATFORM=vnc:size=1600x1200
+#ENV QT_QPA_PLATFORM=vnc:size=1600x1200
+ENV QT_QPA_PLATFORM=xcb
+ENV DISPLAY=host.docker.internal:0
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get install -qy x11-apps libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xkb1 libxkbcommon-x11-0
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get install -qy socat
+
+ENV PYTHONDONTWRITEBYTECODE=1
+
 CMD ["fbs", "run"]
