@@ -23,7 +23,7 @@ import logging
 from time import sleep
 from PIL import Image
 
-from PySide6.QtCore import QCoreApplication, Signal
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QDockWidget
 
 from .. import utils
@@ -48,8 +48,6 @@ class Engine(SignalSender, QDockWidget):
 
     Implemented as a subclass of `QDockWidget` and `SignalSender`.
     """
-
-    port_opener = Signal()
 
     pattern: Pattern
     status: StatusTab
