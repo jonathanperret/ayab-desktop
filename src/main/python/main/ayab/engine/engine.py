@@ -49,6 +49,8 @@ class Engine(SignalSender, QDockWidget):
     Implemented as a subclass of `QDockWidget` and `SignalSender`.
     """
 
+    operation: Operation
+
     port_opener = Signal()
 
     pattern: Pattern
@@ -159,44 +161,44 @@ class Engine(SignalSender, QDockWidget):
         # else
         return self.config.validate()
 
-    def run(self, operation: Operation) -> None:
+    def run(self) -> None:
         self.__canceled = False
 
         # setup knitting controller
         self.config.portname = self.__read_portname()
-        self.control.start(self.pattern, self.config, operation)
+        self.control.start(self.pattern, self.config, self.operation)
 
         while True:
             # continue operating
             # typically each step involves some communication with the device
-            output = self.control.operate(operation)
+            output = self.control.operate(self.operation)
             if output != self.control.notification:
                 self.__feedback.handle(output)
                 self.control.notification = output
-            if operation == Operation.KNIT:
+            if self.operation == Operation.KNIT:
                 self.__handle_status()
             if self.__canceled or self.control.state == State.FINISHED:
                 break
 
         self.control.stop()
 
-        if operation == Operation.KNIT:
+        if self.operation == Operation.KNIT:
             if self.__canceled:
                 self.emit_notification("Knitting canceled.")
                 self.__logger.info("Knitting canceled.")
             else:
-                # operation == Operation.TEST:
                 self.__logger.info("Finished knitting.")
             # small delay to finish printing to knit progress window
             # before "finish.wav" sound plays
             sleep(1)
+        # self.operation == Operation.TEST:
         else:
             # TODO: provide translations for these messages
             self.__logger.info("Finished testing.")
 
         # send signal to finish operation
         # "finish.wav" sound only plays if knitting was not canceled
-        self.emit_operation_finisher(operation, not self.__canceled)
+        self.emit_operation_finisher(self.operation, not self.__canceled)
 
     def __handle_status(self) -> None:
         if self.status.active:
