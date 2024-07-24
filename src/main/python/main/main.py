@@ -6,7 +6,10 @@ from os import path
 import logging
 from distutils.dir_util import copy_tree
 
+import json
+
 from PySide6.QtCore import QCoreApplication, QTranslator, QLocale, QSettings
+from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 
 from typing import TYPE_CHECKING, cast
 
@@ -14,13 +17,14 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:  # TODO: why does mypy not resolve the absolute import correctly?
     from main.ayab.ayab import GuiMain
     from main.ayab import utils
+
     # from https://github.com/python/typing/discussions/1102#discussioncomment-2376328
     cached_property = property
 else:
     try:
         from main.ayab.ayab import GuiMain
         from main.ayab import utils
-    except: #'fbs run' needs weird things.
+    except ImportError:  # 'fbs run' needs weird things.
         from ayab.ayab import GuiMain
         from ayab import utils
     from fbs_runtime.application_context.PySide6 import cached_property
@@ -29,33 +33,59 @@ else:
 class AppContext(ApplicationContext):  # type: ignore # 1. Subclass ApplicationContext
     REPO = "AllYarnsAreBeautiful/ayab-desktop"
 
+    _network_manager: QNetworkAccessManager | None
+    _version_check_reply: QNetworkReply | None
+
     def run(self) -> int:  # 2. Implement run()
         self.make_user_directory()
         self.configure_logger()
         self.install_translator()
         self.main_window.show()
-        pkg = utils.package_version(self)
-        tag = self.check_new_version(self.REPO)
-        if tag is not None and tag != pkg:
-            url = "https://github.com/" + self.REPO + "/releases/tag/" + tag
-            utils.display_blocking_popup(
-                "<p>A new version of the AYAB desktop software has been released!"
-                + " You can download version <strong>"
-                + tag
-                + "</strong> using this link:<br/><br/><a href='"
-                + url
-                + "'>"
-                + url
-                + "</a></p>"
-            )
+        self.check_new_version()
         return cast(int, self.app.exec())  # 3. End run() with this line
 
-    def check_new_version(self, repo: str) -> str:
+    def check_new_version(self) -> None:
+        self._network_manager = QNetworkAccessManager()
+        self._version_check_reply = self._network_manager.get(
+            QNetworkRequest(
+                "https://api.github.com/repos/" + self.REPO + "/releases/latest"
+            )
+        )
+        self._version_check_reply.finished.connect(self.version_check_finished)
+
+    def version_check_finished(self) -> None:
         try:
-            return utils.latest_version(repo)
-        except Exception:
-            return ""
-            pass
+            if self._version_check_reply is None:  # should never happen, pleases mypy
+                return
+
+            if self._version_check_reply.error() != QNetworkReply.NetworkError.NoError:
+                logging.warning(
+                    "Network error while checking for new versions: %s",
+                    self._version_check_reply.errorString(),
+                )
+                return
+
+            data = self._version_check_reply.readAll()
+            obj = json.loads(data.data())
+            if obj["draft"] is False and obj["prerelease"] is False:
+                tag = obj["tag_name"]
+                pkg = utils.package_version(self)
+                if tag is not None and tag != pkg:
+                    url = "https://github.com/" + self.REPO + "/releases/tag/" + tag
+                    utils.display_blocking_popup(
+                        "<p>A new version of the AYAB desktop software"
+                        + " has been released!"
+                        + " You can download version <strong>"
+                        + tag
+                        + "</strong> using this link:<br/><br/><a href='"
+                        + url
+                        + "'>"
+                        + url
+                        + "</a></p>"
+                    )
+        finally:
+            self._version_check_reply = None
+            self._network_manager = None
 
     def make_user_directory(self) -> None:
         self.userdata_path = path.expanduser(path.join("~", "AYAB"))
