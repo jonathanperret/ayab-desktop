@@ -41,7 +41,6 @@ from .preferences import Preferences
 from .progressbar import ProgressBar
 from .about import About
 from .knitprogress import KnitProgress
-from .thread import GenericThread
 from .engine import Engine
 from .engine.engine_fsm import Operation
 from typing import TYPE_CHECKING
@@ -83,7 +82,6 @@ class GuiMain(QMainWindow):
         self.knitprog = KnitProgress(self)
         self.flash = FirmwareFlash(self)
         self.audio = AudioPlayer(self)
-        self.engine_thread = GenericThread(self.engine.run)
 
         # show UI
         self.showMaximized()
@@ -142,15 +140,13 @@ class GuiMain(QMainWindow):
         # reset knit progress window
         self.knitprog.start()
         # start thread for knit engine
-        self.engine.operation = Operation.KNIT
-        self.engine_thread.start()
+        self.engine.start(Operation.KNIT)
 
     def start_testing(self) -> None:
         """Start the testing process."""
         self.start_operation()
         # start thread for test engine
-        self.engine.operation = Operation.TEST
-        self.engine_thread.start()
+        self.engine.start(Operation.TEST)
 
     def start_operation(self) -> None:
         """Disable UI elements at start of operation."""
@@ -160,7 +156,7 @@ class GuiMain(QMainWindow):
 
     def finish_operation(self, operation: Operation, beep: bool) -> None:
         """(Re-)enable UI elements after operation finishes."""
-        self.engine_thread.wait()
+        self.engine.wait()
         self.ui.filename_lineedit.setEnabled(True)
         self.ui.open_image_file_button.setEnabled(True)
         self.menu.setEnabled(True)

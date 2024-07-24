@@ -23,7 +23,7 @@ import logging
 from time import sleep
 from PIL import Image
 
-from PySide6.QtCore import QCoreApplication, Signal
+from PySide6.QtCore import QCoreApplication, Signal, QThread
 from PySide6.QtWidgets import QDockWidget
 
 from .. import utils
@@ -42,6 +42,15 @@ if TYPE_CHECKING:
 from .control import Control
 
 
+class EngineThread(QThread):
+    def __init__(self, engine: Engine):
+        super().__init__()
+        self._engine = engine
+
+    def run(self) -> None:
+        self._engine.run()
+
+
 class Engine(SignalSender, QDockWidget):
     """
     Top-level class for the slave thread that communicates with the shield.
@@ -49,12 +58,14 @@ class Engine(SignalSender, QDockWidget):
     Implemented as a subclass of `QDockWidget` and `SignalSender`.
     """
 
-    operation: Operation
-
     port_opener = Signal()
+    finished = Signal()
 
     pattern: Pattern
     status: StatusTab
+
+    operation: Operation
+    engine_thread: EngineThread
 
     def __init__(self, parent: GuiMain):
         # set up UI
@@ -73,6 +84,9 @@ class Engine(SignalSender, QDockWidget):
         self.__feedback = FeedbackHandler(parent)
         self.__logger = logging.getLogger(type(self).__name__)
         self.setWindowTitle("Machine: " + Machine(self.config.machine).name)
+
+        self.engine_thread = EngineThread(self)
+        self.engine_thread.finished.connect(self.finished)
 
     def __del__(self) -> None:
         self.control.stop()
@@ -161,7 +175,19 @@ class Engine(SignalSender, QDockWidget):
         # else
         return self.config.validate()
 
+    def start(self, operation: Operation) -> None:
+        """Starts a thread for the given operation"""
+        if self.engine_thread.isRunning():
+            raise Exception("Engine thread is already running!")
+
+        self.operation = operation
+        self.engine_thread.start()
+
+    def wait(self) -> bool:
+        return self.engine_thread.wait()
+
     def run(self) -> None:
+        """Runs on a dedicated thread"""
         self.__canceled = False
 
         # setup knitting controller

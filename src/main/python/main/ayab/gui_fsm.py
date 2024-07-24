@@ -67,9 +67,7 @@ class gui_fsm(object):
         self.NO_IMAGE.addTransition(
             parent.menu.ui.action_test_AYAB_device.triggered, self.TESTING_NO_IMAGE
         )
-        self.TESTING_NO_IMAGE.addTransition(
-            parent.engine_thread.finished, self.NO_IMAGE
-        )
+        self.TESTING_NO_IMAGE.addTransition(parent.engine.finished, self.NO_IMAGE)
         self.CONFIGURING.addTransition(parent.ui.knit_button.clicked, self.CHECKING)
         self.CONFIGURING.addTransition(
             parent.menu.ui.action_knit.triggered, self.CHECKING
@@ -89,8 +87,8 @@ class gui_fsm(object):
         self.CHECKING.addTransition(
             parent.signal_receiver.knitting_starter, self.KNITTING
         )
-        self.KNITTING.addTransition(parent.engine_thread.finished, self.CONFIGURING)
-        self.TESTING.addTransition(parent.engine_thread.finished, self.CONFIGURING)
+        self.KNITTING.addTransition(parent.engine.finished, self.CONFIGURING)
+        self.TESTING.addTransition(parent.engine.finished, self.CONFIGURING)
 
         # Actions triggered by state changes
         self.NO_IMAGE.entered.connect(lambda: logging.debug("Entered state NO_IMAGE"))
