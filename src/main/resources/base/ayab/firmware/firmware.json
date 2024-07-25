@@ -2,9 +2,12 @@
     "controller": {
         "uno":[
             {
-                "url":"/",
-                "version":"0.99.0-rc1",
+                "version":"0.99.0-rc3",
                 "file":"ayab_monolithic_uno.hex"
+            },
+            {
+                "version":"0.99.0-20240725-no-start-delay",
+                "file":"ayab_monolithic_uno-20240725-no-start-delay.hex"
             }
         ]
     }
