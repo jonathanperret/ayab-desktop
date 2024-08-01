@@ -15,8 +15,6 @@
 name: Build
 on:
   push:
-    tags:
-      - "v?[0-9]+.[0-9]+.[0-9]+-?[a-zA-Z0-9]*"
 
 jobs:
   setup:
@@ -278,6 +276,7 @@ jobs:
           Move-Item -Path target\AYABSetup.exe -Destination target\AYAB-${{ steps.vars.outputs.tag }}.exe
       - name: Upload asset
         uses: ncipollo/release-action@v1
+        if: steps.vars.outputs.do-release == 'true'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.vars.outputs.tag }}
@@ -393,7 +392,7 @@ jobs:
       - name: Build app
         run: |
           python -m fbs freeze
-          codesign -s - --force --all-architectures --timestamp --deep ./target/AYAB-mac.app
+          codesign -s - --force --all-architectures --timestamp --deep ./target/AYAB.app
       - name: Create installer
         run: |
           python -m fbs installer
@@ -401,6 +400,7 @@ jobs:
           mv target/AYAB.dmg target/AYAB-${{ steps.vars.outputs.tag }}.dmg
       - name: Upload asset
         uses: ncipollo/release-action@v1
+        if: steps.vars.outputs.do-release == 'true'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.vars.outputs.tag }}
@@ -570,6 +570,7 @@ jobs:
           mv ayab-${{ steps.vars.outputs.tag }}-x86_64.AppImage AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
       - name: Upload asset
         uses: ncipollo/release-action@v1
+        if: steps.vars.outputs.do-release == 'true'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.vars.outputs.tag }}
