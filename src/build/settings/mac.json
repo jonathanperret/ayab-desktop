@@ -1,7 +1,5 @@
 {
-    "mac_bundle_identifier": "",
-    "resources_to_filter": [
-        "src/main/resources/mac-frozen/Contents/Info.plist"
-    ],
+    "freeze_dir": "target/${app_name}.app",
+    "mac_bundle_identifier": "com.ayab-knitting.AYAB",
     "extra_pyinstaller_args": ["--target-arch","universal2"]
 }
