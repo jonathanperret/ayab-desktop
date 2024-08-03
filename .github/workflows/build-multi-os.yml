@@ -299,7 +299,7 @@ jobs:
   build-macos:
     name: Create and upload Mac OSX release
     needs: setup
-    runs-on: macos-14
+    runs-on: macos-12
     strategy:
       matrix:
         python-version: [3.11]
@@ -312,7 +312,6 @@ jobs:
       - uses: ./.github/actions/init-environment
         id: vars
       - name: Install dependencies
-        shell: zsh {0}
         run: |
           brew install avrdude
           mkdir tmp-wheel/
@@ -322,11 +321,11 @@ jobs:
 
           python -m pip download --only-binary=:all: --platform macosx_10_09_x86_64 "$(grep numpy requirements.build.txt)"
           python -m pip download --only-binary=:all: --platform macosx_11_0_arm64 "$(grep numpy requirements.build.txt)"
-          delocate-fuse numpy*arm* numpy*x86* -w tmp-wheel/
+          delocate-fuse numpy*x86* numpy*arm* -w tmp-wheel/
 
           python -m pip download --only-binary=:all: --platform macosx_10_10_x86_64 "$(grep Pillow requirements.build.txt)"
           python -m pip download --only-binary=:all: --platform macosx_11_0_arm64 "$(grep Pillow requirements.build.txt)"
-          delocate-fuse Pillow*arm* Pillow*x86* -w tmp-wheel/
+          delocate-fuse Pillow*x86* Pillow*arm* -w tmp-wheel/
 
           python -m pip download --only-binary=:all: --platform=macosx_10_9_universal2 "$(grep bitarray requirements.build.txt)"
 
