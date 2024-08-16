@@ -1,11 +1,15 @@
 {
-    "controller": {
-        "uno":[
-            {
-                "url":"/",
-                "version":"0.99.0-rc1",
-                "file":"ayab_monolithic_uno.hex"
-            }
-        ]
-    }
+  "controller": {
+    "uno": [
+      {
+        "url": "/",
+        "version": "0.99.0-rc1",
+        "file": "ayab_monolithic_uno.hex"
+      },
+      {
+        "version": "v0.99.0-20240816-kg-testing",
+        "file": "ayab-v0.99.0-20240816-kg-testing.hex"
+      }
+    ]
+  }
 }
