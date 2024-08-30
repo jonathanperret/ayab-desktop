@@ -140,7 +140,6 @@ class GuiMain(QMainWindow):
 
     def start_knitting(self) -> None:
         """Start the knitting process."""
-        self.start_operation()
         # reset knit progress window
         self.knitprog.start()
         # start thread for knit engine
@@ -148,26 +147,16 @@ class GuiMain(QMainWindow):
 
     def start_testing(self) -> None:
         """Start the testing process."""
-        self.start_operation()
         # start thread for test engine
         self.test_thread.start()
 
-    def start_operation(self) -> None:
-        """Disable UI elements at start of operation."""
-        self.ui.filename_lineedit.setEnabled(False)
-        self.ui.open_image_file_button.setEnabled(False)
-        self.menu.setEnabled(False)
-
     def finish_operation(self, operation: Operation, beep: bool) -> None:
-        """(Re-)enable UI elements after operation finishes."""
+        """Called when an operation finishes."""
         if operation == Operation.KNIT:
             self.knit_thread.wait()
         else:
             # operation = Operation.TEST:
             self.test_thread.wait()
-        self.ui.filename_lineedit.setEnabled(True)
-        self.ui.open_image_file_button.setEnabled(True)
-        self.menu.setEnabled(True)
 
         if operation == Operation.KNIT and beep:
             self.audio.play("finish")

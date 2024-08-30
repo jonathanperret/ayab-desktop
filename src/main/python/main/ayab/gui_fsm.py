@@ -118,37 +118,146 @@ class gui_fsm(object):
         states in Finite State Machine
         """
         # Dock widget
-        self.NO_IMAGE.assignProperty(parent.engine, "enabled", "False")
-        self.CONFIGURING.assignProperty(parent.engine, "enabled", "True")
-        self.KNITTING.assignProperty(parent.engine, "enabled", "False")
-        self.TESTING.assignProperty(parent.engine, "enabled", "False")
+        self.NO_IMAGE.assignProperty(parent.engine, "enabled", False)
+        self.CONFIGURING.assignProperty(parent.engine, "enabled", True)
+        self.KNITTING.assignProperty(parent.engine, "enabled", False)
+        self.TESTING.assignProperty(parent.engine, "enabled", False)
+        self.TESTING_NO_IMAGE.assignProperty(parent.engine, "enabled", False)
 
         # Status tab in options dock should be activated only when knitting
-        # self.NO_IMAGE.assignProperty(ui.status_tab, "enabled", "False")
-        # self.CONFIGURING.assignProperty(ui.status_tab, "enabled", "False")
-        # self.KNITTING.assignProperty(ui.status_tab, "enabled", "True")
+        # self.NO_IMAGE.assignProperty(ui.status_tab, "enabled", False)
+        # self.CONFIGURING.assignProperty(ui.status_tab, "enabled", False)
+        # self.KNITTING.assignProperty(ui.status_tab, "enabled", True)
 
         # Knit button
-        self.NO_IMAGE.assignProperty(parent.ui.knit_button, "enabled", "False")
-        self.CONFIGURING.assignProperty(parent.ui.knit_button, "enabled", "True")
-        self.KNITTING.assignProperty(parent.ui.knit_button, "enabled", "False")
-        self.TESTING.assignProperty(parent.ui.knit_button, "enabled", "False")
+        self.NO_IMAGE.assignProperty(parent.ui.knit_button, "enabled", False)
+        self.CONFIGURING.assignProperty(parent.ui.knit_button, "enabled", True)
+        self.KNITTING.assignProperty(parent.ui.knit_button, "enabled", False)
+        self.TESTING.assignProperty(parent.ui.knit_button, "enabled", False)
+        self.TESTING_NO_IMAGE.assignProperty(parent.ui.knit_button, "enabled", False)
 
         # Knit menu action
-        self.NO_IMAGE.assignProperty(parent.menu.ui.action_knit, "enabled", "False")
-        self.CONFIGURING.assignProperty(parent.menu.ui.action_knit, "enabled", "True")
-        self.KNITTING.assignProperty(parent.menu.ui.action_knit, "enabled", "False")
-        self.TESTING.assignProperty(parent.menu.ui.action_knit, "enabled", "False")
+        self.NO_IMAGE.assignProperty(parent.menu.ui.action_knit, "enabled", False)
+        self.CONFIGURING.assignProperty(parent.menu.ui.action_knit, "enabled", True)
+        self.KNITTING.assignProperty(parent.menu.ui.action_knit, "enabled", False)
+        self.TESTING.assignProperty(parent.menu.ui.action_knit, "enabled", False)
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.menu.ui.action_knit, "enabled", False
+        )
 
         # Cancel button
-        self.NO_IMAGE.assignProperty(parent.ui.cancel_button, "enabled", "False")
-        self.CONFIGURING.assignProperty(parent.ui.cancel_button, "enabled", "False")
-        self.KNITTING.assignProperty(parent.ui.cancel_button, "enabled", "True")
-        self.TESTING.assignProperty(parent.ui.cancel_button, "enabled", "False")
+        self.NO_IMAGE.assignProperty(parent.ui.cancel_button, "enabled", False)
+        self.CONFIGURING.assignProperty(parent.ui.cancel_button, "enabled", False)
+        self.KNITTING.assignProperty(parent.ui.cancel_button, "enabled", True)
+        self.TESTING.assignProperty(parent.ui.cancel_button, "enabled", False)
+        self.TESTING_NO_IMAGE.assignProperty(parent.ui.cancel_button, "enabled", False)
+
         # Cancel Knitting menu action
-        self.NO_IMAGE.assignProperty(parent.menu.ui.action_cancel, "enabled", "False")
-        self.CONFIGURING.assignProperty(
-            parent.menu.ui.action_cancel, "enabled", "False"
+        self.NO_IMAGE.assignProperty(parent.menu.ui.action_cancel, "enabled", False)
+        self.CONFIGURING.assignProperty(parent.menu.ui.action_cancel, "enabled", False)
+        self.KNITTING.assignProperty(parent.menu.ui.action_cancel, "enabled", True)
+        self.TESTING.assignProperty(parent.menu.ui.action_cancel, "enabled", False)
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.menu.ui.action_cancel, "enabled", False
         )
-        self.KNITTING.assignProperty(parent.menu.ui.action_cancel, "enabled", "True")
-        self.TESTING.assignProperty(parent.menu.ui.action_cancel, "enabled", "False")
+
+        # Image actions menu
+        self.NO_IMAGE.assignProperty(parent.menu.ui.menu_image_actions, "enabled", True)
+        self.CONFIGURING.assignProperty(
+            parent.menu.ui.menu_image_actions, "enabled", True
+        )
+        self.KNITTING.assignProperty(
+            parent.menu.ui.menu_image_actions, "enabled", False
+        )
+        self.TESTING.assignProperty(parent.menu.ui.menu_image_actions, "enabled", False)
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.menu.ui.menu_image_actions, "enabled", False
+        )
+
+        # Open image menu item
+        self.NO_IMAGE.assignProperty(
+            parent.menu.ui.action_open_image_file, "enabled", True
+        )
+        self.CONFIGURING.assignProperty(
+            parent.menu.ui.action_open_image_file, "enabled", True
+        )
+        self.KNITTING.assignProperty(
+            parent.menu.ui.action_open_image_file, "enabled", False
+        )
+        self.TESTING.assignProperty(
+            parent.menu.ui.action_open_image_file, "enabled", False
+        )
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.menu.ui.action_open_image_file, "enabled", False
+        )
+
+        # Preferences menu item
+        self.NO_IMAGE.assignProperty(
+            parent.menu.ui.action_set_preferences, "enabled", True
+        )
+        self.CONFIGURING.assignProperty(
+            parent.menu.ui.action_set_preferences, "enabled", True
+        )
+        self.KNITTING.assignProperty(
+            parent.menu.ui.action_set_preferences, "enabled", False
+        )
+        self.TESTING.assignProperty(
+            parent.menu.ui.action_set_preferences, "enabled", False
+        )
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.menu.ui.action_set_preferences, "enabled", False
+        )
+
+        # Load firmware menu item
+        self.NO_IMAGE.assignProperty(
+            parent.menu.ui.action_load_AYAB_firmware, "enabled", True
+        )
+        self.CONFIGURING.assignProperty(
+            parent.menu.ui.action_load_AYAB_firmware, "enabled", True
+        )
+        self.KNITTING.assignProperty(
+            parent.menu.ui.action_load_AYAB_firmware, "enabled", False
+        )
+        self.TESTING.assignProperty(
+            parent.menu.ui.action_load_AYAB_firmware, "enabled", False
+        )
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.menu.ui.action_load_AYAB_firmware, "enabled", False
+        )
+
+        # Test menu item
+        self.NO_IMAGE.assignProperty(
+            parent.menu.ui.action_test_AYAB_device, "enabled", True
+        )
+        self.CONFIGURING.assignProperty(
+            parent.menu.ui.action_test_AYAB_device, "enabled", True
+        )
+        self.KNITTING.assignProperty(
+            parent.menu.ui.action_test_AYAB_device, "enabled", False
+        )
+        self.TESTING.assignProperty(
+            parent.menu.ui.action_test_AYAB_device, "enabled", False
+        )
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.menu.ui.action_test_AYAB_device, "enabled", False
+        )
+
+        # Open image button
+        self.NO_IMAGE.assignProperty(parent.ui.open_image_file_button, "enabled", True)
+        self.CONFIGURING.assignProperty(
+            parent.ui.open_image_file_button, "enabled", True
+        )
+        self.KNITTING.assignProperty(parent.ui.open_image_file_button, "enabled", False)
+        self.TESTING.assignProperty(parent.ui.open_image_file_button, "enabled", False)
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.ui.open_image_file_button, "enabled", False
+        )
+
+        # File input
+        self.NO_IMAGE.assignProperty(parent.ui.filename_lineedit, "enabled", True)
+        self.CONFIGURING.assignProperty(parent.ui.filename_lineedit, "enabled", True)
+        self.KNITTING.assignProperty(parent.ui.open_image_file_button, "enabled", False)
+        self.TESTING.assignProperty(parent.ui.open_image_file_button, "enabled", False)
+        self.TESTING_NO_IMAGE.assignProperty(
+            parent.ui.open_image_file_button, "enabled", False
+        )
