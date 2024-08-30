@@ -204,7 +204,7 @@ class Communication(object):
         # else
         for t in list(Token):
             if msg[0] == t.value:
-                return msg, t, msg[1]
+                return msg, t, msg[1] if len(msg) > 1 else 0
         # fallthrough
         self.logger.debug("unknown message: ")  # drop crlf
         pp = pprint.PrettyPrinter(indent=4)
