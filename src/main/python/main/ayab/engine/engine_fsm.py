@@ -93,6 +93,7 @@ class StateMachine:
                 control.api_version = param
                 control.state = State.INIT
                 control.logger.debug("State INIT")
+                control.com.req_init_API6(control.machine)
                 return Output.NONE
             else:
                 control.logger.error(
@@ -125,7 +126,6 @@ class StateMachine:
                 control.logger.error("Error initializing firmware: " + str(param))
                 return Output.ERROR_INITIALIZING_FIRMWARE
         # else
-        control.com.req_init_API6(control.machine)
         return Output.INITIALIZING_FIRMWARE
 
     @staticmethod
