@@ -408,7 +408,7 @@ jobs:
       - name: Build app
         run: |
           python -m fbs freeze
-          codesign -s - --force --all-architectures --timestamp --deep ./target/AYAB-mac.app
+          codesign -s - --force --timestamp ./target/AYAB-mac.app
       - name: Create installer
         run: |
           python -m fbs installer
