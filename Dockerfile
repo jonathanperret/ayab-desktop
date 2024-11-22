@@ -1,7 +1,8 @@
+ARG UBUNTU_VERSION=22.04
 ARG PYTHON_VERSION=3.11.9
 ARG PYSIDE_VERSION=6.6.2
 
-FROM ubuntu:22.04 AS python-build
+FROM ubuntu:$UBUNTU_VERSION AS python-build
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean
 
@@ -23,7 +24,7 @@ RUN /root/.pyenv/bin/pyenv install --verbose 3.11.9
 
 FROM python-$PYTHON_VERSION AS python
 
-FROM ubuntu:22.04 AS base
+FROM ubuntu:$UBUNTU_VERSION AS base
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean
 
