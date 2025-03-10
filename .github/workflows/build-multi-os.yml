@@ -441,7 +441,8 @@ jobs:
           # in a directory meant to contain executables.
           find ./target/AYAB-mac.app/Contents/Resources/ayab/firmware \
             -type f \( -name avrdude_bin -o -name \*.dylib \) \
-            -exec codesign -s "$APPLE_CERTIFICATE_NAME" --force --timestamp {} \;
+            -exec codesign -s "$APPLE_CERTIFICATE_NAME" --force --all-architectures --timestamp \
+              --options=runtime {} \;
           codesign -s "$APPLE_CERTIFICATE_NAME" --force --all-architectures --timestamp --deep \
             --options=runtime ./target/AYAB-mac.app
 
