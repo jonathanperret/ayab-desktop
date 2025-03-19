@@ -338,24 +338,22 @@ jobs:
         id: vars
       - name: Install dependencies
         run: |
-          mkdir tmp-wheel/
-          python -m pip install delocate==0.11.0
-
-          # Find platform values on e.g. https://pypi.org/project/numpy/1.26.4/#files
-
-          python -m pip download --only-binary=:all: --platform macosx_10_09_x86_64 "$(grep numpy requirements.build.txt)"
-          python -m pip download --only-binary=:all: --platform macosx_11_0_arm64 "$(grep numpy requirements.build.txt)"
-          delocate-fuse numpy*arm* numpy*x86* -w tmp-wheel/
-
-          python -m pip download --only-binary=:all: --platform macosx_10_10_x86_64 "$(grep Pillow requirements.build.txt)"
-          python -m pip download --only-binary=:all: --platform macosx_11_0_arm64 "$(grep Pillow requirements.build.txt)"
-          delocate-fuse Pillow*arm* Pillow*x86* -w tmp-wheel/
-
-          python -m pip install tmp-wheel/*.whl
-
           # For simple packages like bitarray and simpleaudio, it is enough to force
           # a build from source to get a universal binary.
           export PIP_NO_BINARY=bitarray,simpleaudio-patched
+
+          # For more complex packages like numpy and Pillow, we need to download the
+          # wheels for each architecture and fuse them together.
+          python -m pip install delocate==0.11.0
+          for dep in numpy Pillow; do
+            mkdir tmp-wheel-in tmp-wheel-out
+            for arch in arm64 x86_64; do
+              arch -${arch} python -m pip download --dest tmp-wheel-in "$(grep ${dep} requirements.build.txt)"
+            done
+            delocate-fuse tmp-wheel-in/*arm64.whl tmp-wheel-in/*x86_64.whl -w tmp-wheel-out/
+            python -m pip install tmp-wheel-out/*.whl
+            rm -rf tmp-wheel-in tmp-wheel-out
+          done
 
           python -m pip install -r requirements.build.txt
       - name: Restore cached firmware
