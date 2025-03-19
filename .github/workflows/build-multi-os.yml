@@ -340,13 +340,13 @@ jobs:
         run: |
           # For packages that have native extensions, we need to download the
           # wheels for each architecture and fuse them together.
-          python -m pip install delocate==0.11.0
+          python -m pip install delocate==0.13.0
           for dep in bitarray simpleaudio-patched numpy Pillow; do
             mkdir tmp-wheel-in tmp-wheel-out
             for arch in arm64 x86_64; do
               arch -${arch} python -m pip download --dest tmp-wheel-in "$(grep ${dep} requirements.build.txt)"
             done
-            delocate-fuse tmp-wheel-in/*arm64.whl tmp-wheel-in/*x86_64.whl -w tmp-wheel-out/
+            delocate-merge tmp-wheel-in/*.whl -w tmp-wheel-out/
             python -m pip install tmp-wheel-out/*.whl
             rm -rf tmp-wheel-in tmp-wheel-out
           done
