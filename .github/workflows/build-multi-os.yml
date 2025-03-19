@@ -338,14 +338,10 @@ jobs:
         id: vars
       - name: Install dependencies
         run: |
-          # For simple packages like bitarray and simpleaudio, it is enough to force
-          # a build from source to get a universal binary.
-          export PIP_NO_BINARY=bitarray,simpleaudio-patched
-
-          # For more complex packages like numpy and Pillow, we need to download the
+          # For packages that have native extensions, we need to download the
           # wheels for each architecture and fuse them together.
           python -m pip install delocate==0.11.0
-          for dep in numpy Pillow; do
+          for dep in bitarray simpleaudio-patched numpy Pillow; do
             mkdir tmp-wheel-in tmp-wheel-out
             for arch in arm64 x86_64; do
               arch -${arch} python -m pip download --dest tmp-wheel-in "$(grep ${dep} requirements.build.txt)"
