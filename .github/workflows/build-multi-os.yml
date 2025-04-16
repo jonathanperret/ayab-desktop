@@ -75,8 +75,8 @@ jobs:
               mv squashfs-root $HOME/.local/bin/.appimagetool.appdir.$(uname -i)
               
               # Install working patchelf
-              yum --disablerepo="*" --enablerepo=epel install -y patchelf
-              ln -s $(which patchelf) $HOME/.local/bin
+              curl -SsLO "https://github.com/NixOS/patchelf/releases/download/0.14.3/patchelf-0.14.3-$(uname -i).tar.gz"
+              tar -C $HOME/.local -xvzf patchelf*.gz ./bin/patchelf
 
               # Install python-appimage
               python${{steps.vars.outputs.python-minor}} -m pip install python-appimage==1.3.0
