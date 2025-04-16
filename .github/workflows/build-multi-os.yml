@@ -23,6 +23,8 @@ jobs:
   build-appimage:
     name: Create and upload Linux AppImage release
     runs-on: ubuntu-22.04
+    env:
+      ARCH: x86_64
     steps:
       - name: Checkout repo into AppDir
         uses: actions/checkout@v4
@@ -145,13 +147,12 @@ jobs:
 
       - name: Convert to AppImage
         run: |
-          wget -c https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep appimagetool-.*-x86_64.AppImage | head -n 1 | cut -d '"' -f 2)
-          chmod +x appimagetool-*-x86_64.AppImage
+          wget -c https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep appimagetool-.*-${{ env.ARCH }}.AppImage | head -n 1 | cut -d '"' -f 2)
+          chmod +x appimagetool-*-${{ env.ARCH }}.AppImage
           chmod 755 squashfs-root
           sudo apt install appstream
-          VERSION=${{steps.vars.outputs.tag}} ./appimagetool-*-x86_64.AppImage squashfs-root/
-          sudo apt remove appstream
-          mv ayab-${{ steps.vars.outputs.tag }}-x86_64.AppImage AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
+          VERSION=${{steps.vars.outputs.tag}} ./appimagetool-*-${{ env.ARCH }}.AppImage squashfs-root/
+          mv ayab-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
 
       - name: Attach AppImage to release
         uses: ncipollo/release-action@v1
@@ -161,7 +162,7 @@ jobs:
           tag: ${{ steps.vars.outputs.tag }}
           commit: ${{ steps.vars.outputs.sha }}
           allowUpdates: true
-          artifacts: AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
+          artifacts: AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
           artifactContentType: application/AppImage
           replacesArtifacts: true
           # Default to draft and prerelease to let a human check the release before it goes live
@@ -175,5 +176,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
-          path: AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
+          name: AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
+          path: AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
