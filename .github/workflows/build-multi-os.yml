@@ -22,10 +22,11 @@ jobs:
   # see https://github.com/AppImage/AppImageKit/wiki/Bundling-Python-apps
   build-appimage:
     name: Create and upload Linux AppImage release
-    runs-on: ubuntu-22.04 #-arm
+    # runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04-arm
     env:
-      #ARCH: aarch64
-      ARCH: x86_64
+      # ARCH: x86_64
+      ARCH: aarch64
     steps:
       - name: Checkout repo into AppDir
         uses: actions/checkout@v4
