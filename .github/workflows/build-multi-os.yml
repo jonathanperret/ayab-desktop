@@ -22,8 +22,9 @@ jobs:
   # see https://github.com/AppImage/AppImageKit/wiki/Bundling-Python-apps
   build-appimage:
     name: Create and upload Linux AppImage release
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04 #-arm
     env:
+      #ARCH: aarch64
       ARCH: x86_64
     steps:
       - name: Checkout repo into AppDir
@@ -68,11 +69,11 @@ jobs:
               mkdir -p $HOME/.local/bin
 
               # Install working appimagetool
-              curl -SsLO https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -i).AppImage
+              curl -SsLO "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -i).AppImage"
               chmod +x appimagetool*.AppImage
               ./appimagetool*.AppImage --appimage-extract
-              mv squashfs-root $HOME/.local/bin/.appimagetool
-
+              mv squashfs-root $HOME/.local/bin/.appimagetool.appdir.$(uname -i)
+              
               # Install working patchelf
               yum --disablerepo="*" --enablerepo=epel install -y patchelf
               ln -s $(which patchelf) $HOME/.local/bin
