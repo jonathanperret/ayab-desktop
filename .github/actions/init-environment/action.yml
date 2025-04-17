@@ -34,8 +34,7 @@ runs:
         fi
         echo "sha-short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
         echo "tag=$(git describe --tags)" >> $GITHUB_OUTPUT
-        echo "python-minor=$(echo '${{steps.py.outputs.python-version}}' | sed -e 's/\.[^.]*$//')" >> $GITHUB_OUTPUT
-        echo "python-appimage=python${{steps.py.outputs.python-version}}-cp311-cp311-manylinux_2_28_x86_64.AppImage" >> $GITHUB_OUTPUT
+        echo "python-minor=$(echo "$PYTHON_VERSION" | sed -e 's/\.[^.]*$//')" >> $GITHUB_OUTPUT
 
     - name: Get firmware version matching manifest
       id: firmware
