@@ -101,7 +101,8 @@ jobs:
       - name: Add icon
         run: |
           rm -rf python.png usr/share/icons/
-          ln -sf linux-build/appimage/ayab.png .DirIcon
+          cp linux-build/appimage/ayab.png .
+          ln -sf ayab.png .DirIcon
 
       - name: Create desktop file
         run: |
