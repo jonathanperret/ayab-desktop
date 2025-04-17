@@ -92,6 +92,7 @@ jobs:
 
       - name: Replace AppRun
         run: |
+          rm -f squashfs-root/AppRun
           cp -v linux-build/appimage/AppRun squashfs-root/AppRun
 
       - name: Copy sources
