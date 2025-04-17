@@ -1,10 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=ayab
+Name=AYAB
 Exec=ayab
 Comment=All Yarns Are Beautiful
 Icon=ayab
 Categories=Graphics;
 Terminal=false
-X-AppImage-Version=v0.95-104-gc97f0b6
-
+X-AppImage-Version=v1.0.0
