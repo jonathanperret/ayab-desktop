@@ -46,6 +46,7 @@ jobs:
           curl --fail -O '${{ steps.vars.outputs.firmware-url }}'
 
       - name: Build AppImage of Python designed for manylinux
+        shell: bash -xe
         run: |
           arch=$(uname -i)
           # Create directory where python-appimage will look for its tools
