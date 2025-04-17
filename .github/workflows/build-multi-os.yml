@@ -86,6 +86,7 @@ jobs:
 
       - name: Convert UI and translation files
         run: |
+          yum install -qy double-conversion # required by pyside6-uic and pyside6-lrelease
           cat setup-environment.ps1 | grep -v genpyi | grep -v submodule | bash -x
           # bash setup-environment.ps1
 
