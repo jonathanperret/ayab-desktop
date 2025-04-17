@@ -70,14 +70,11 @@ jobs:
 
           # Extract AppImage
           ./python3*.AppImage --appimage-extract
-          shopt -s dotglob
-          mv squashfs-root/* .
-          rmdir squashfs-root
 
       - name: Add AppDir subdirectories to PATH
         run: |
-          echo "$PWD/usr/bin" >> $GITHUB_PATH
-          # echo "$PWD/opt/${{steps.vars.outputs.python-minor}}/bin" >> $GITHUB_PATH
+          echo "$PWD/squashfs-root/usr/bin" >> $GITHUB_PATH
+          # echo "$PWD/squashfs-root/opt/${{steps.vars.outputs.python-minor}}/bin" >> $GITHUB_PATH
 
       - name: Install Python modules
         run: |
@@ -91,37 +88,40 @@ jobs:
 
       - name: Remove unneeded files
         run: |
-          rm -rf .git
           find src/main/python \( -name '*.ui' -o -name '$.qrc' \) -delete
 
       - name: Replace AppRun
         run: |
-          cp -v linux-build/appimage/AppRun .
+          cp -v linux-build/appimage/AppRun squashfs-root/AppRun
+
+      - name: Copy sources
+        run: |
+          cp -Rv src squashfs-root/
 
       - name: Add icon
         run: |
+          cd squashfs-root
           rm -rf python.png usr/share/icons/
-          cp linux-build/appimage/ayab.png .
+          cp ../linux-build/appimage/ayab.png .
           ln -sf ayab.png .DirIcon
 
       - name: Create desktop file
         run: |
+          cd squashfs-root
           rm -rf *.desktop usr/share/applications/
-          ln -s linux-build/appimage/com.ayab_knitting.ayab.desktop .
+          cp ../linux-build/appimage/com.ayab_knitting.ayab.desktop .
 
       - name: Add metadata
         run: |
-          mkdir -p usr/share/metainfo/
+          cd squashfs-root
           rm -f usr/share/metainfo/*.appdata.xml
-          cp linux-build/appimage/ayab.appdata.xml usr/share/metainfo/
+          cp ../linux-build/appimage/ayab.appdata.xml usr/share/metainfo/
 
       - name: Convert to AppImage
         run: |
           yum install -qy appstream
-          appdir=$PWD
-          cd /tmp
-          VERSION=${{steps.vars.outputs.tag}} $HOME/.local/bin/.appimagetool.appdir.$(uname -i)/AppRun "$appdir"
-          mv ayab-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage $appdir/
+          VERSION=${{steps.vars.outputs.tag}} $HOME/.local/bin/.appimagetool.appdir.$(uname -i)/AppRun squashfs-root
+          mv *.AppImage ayab-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
 
       - name: Attach AppImage to release
         uses: ncipollo/release-action@v1
