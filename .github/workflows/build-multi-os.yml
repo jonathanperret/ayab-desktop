@@ -88,18 +88,11 @@ jobs:
         run: |
           yum install -qy double-conversion # required by pyside6-uic and pyside6-lrelease
           cat setup-environment.ps1 | grep -v genpyi | grep -v submodule | bash -x
-          # bash setup-environment.ps1
-
-      - name: Install dependencies
-        run: |
-          python -m pip install -r requirements.build.txt
 
       - name: Remove unneeded files
         run: |
-          rm src/main/python/main/ayab/*_gui.ui
-          rm src/main/python/main/ayab/ayab_logo_rc.qrc
-          rm src/main/python/main/ayab/engine/lowercase_e_rc.qrc
-          rm src/main/python/main/ayab/engine/lowercase_e_reversed_rc.qrc
+          rm -rf .git
+          find src/main/python \( -name '*.ui' -o -name '$.qrc' \) -delete
 
       - name: Replace AppRun
         run: |
