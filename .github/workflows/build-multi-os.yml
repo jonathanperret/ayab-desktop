@@ -45,22 +45,6 @@ jobs:
         run: |
           curl --fail -O '${{ steps.vars.outputs.firmware-url }}'
 
-      - name: Install Python modules
-        run: |
-          sudo apt-get install -qy libasound2-dev
-          python -m pip install -r requirements.build.txt
-
-      - name: Convert UI and translation files
-        run: |
-          bash setup-environment.ps1
-
-      - name: Relocate
-        run: |
-          mkdir git
-          shopt -s extglob dotglob
-          cp -r !(git) git
-          shopt -u dotglob
-
       - name: Build AppImage of Python designed for manylinux
         run: |
           arch=$(uname -i)
@@ -83,60 +67,54 @@ jobs:
           # Build AppImage from python install in manylinux image
           python${{steps.vars.outputs.python-minor}} -m python_appimage -v build local
 
-          # Move AppImage to working directory
-          mv -v python3*.AppImage python.AppImage
-
-      - name: Extract the AppImage
-        run: |
-          ./python.AppImage --appimage-extract
-
-      - name: Move repo
-        run: mv git/* squashfs-root
-
-      - name: Install dependencies
-        run: |
-          cd squashfs-root
-          ./AppRun -m pip install -r requirements.build.txt
+          # Extract AppImage
+          ./python3*.AppImage --appimage-extract
+          shopt -s dotglob
+          mv squashfs-root/* .
+          rmdir squashfs-root
 
       - name: Add AppDir subdirectories to PATH
         run: |
-          echo "usr/bin" >> $GITHUB_PATH
-          echo "opt/${{steps.vars.outputs.python-minor}}/bin" >> $GITHUB_PATH
+          echo "$PWD/usr/bin" >> $GITHUB_PATH
+          # echo "$PWD/opt/${{steps.vars.outputs.python-minor}}/bin" >> $GITHUB_PATH
+
+      - name: Install Python modules
+        run: |
+          yum install -qy alsa-lib-devel
+          python -m pip install -r requirements.build.txt
+
+      - name: Convert UI and translation files
+        run: |
+          cat setup-environment.ps1 | grep -v genpyi | grep -v submodule | bash -x
+          # bash setup-environment.ps1
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements.build.txt
 
       - name: Remove unneeded files
         run: |
-          rm squashfs-root/src/main/python/main/ayab/*_gui.ui
-          rm squashfs-root/src/main/python/main/ayab/ayab_logo_rc.qrc
-          rm squashfs-root/src/main/python/main/ayab/engine/lowercase_e_rc.qrc
-          rm squashfs-root/src/main/python/main/ayab/engine/lowercase_e_reversed_rc.qrc
+          rm src/main/python/main/ayab/*_gui.ui
+          rm src/main/python/main/ayab/ayab_logo_rc.qrc
+          rm src/main/python/main/ayab/engine/lowercase_e_rc.qrc
+          rm src/main/python/main/ayab/engine/lowercase_e_reversed_rc.qrc
 
       - name: Replace AppRun
         run: |
-          cd squashfs-root
-          rm AppRun
-          cp linux-build/appimage/AppRun .
+          cp -v linux-build/appimage/AppRun .
 
       - name: Add icon
         run: |
-          cd squashfs-root
-          rm -f *.png
-          rm -rf usr/share/icons/
-          cp linux-build/appimage/ayab.png ayab.png
-          mkdir -p usr/share/icons/hicolor/128x128/apps/
-          cp ayab.png usr/share/icons/hicolor/128x128/apps/
+          rm -rf python.png usr/share/icons/
+          ln -sf linux-build/appimage/ayab.png .DirIcon
 
       - name: Create desktop file
         run: |
-          cd squashfs-root
-          rm -f python*.desktop
-          mkdir -p usr/share/applications/
-          rm -f usr/share/applications/*.desktop
-          cp linux-build/appimage/com.ayab_knitting.ayab.desktop com.ayab_knitting.ayab.desktop
-          cp com.ayab_knitting.ayab.desktop usr/share/applications/com.ayab_knitting.ayab.desktop
+          rm -f *.desktop usr/share/applications/
+          ln -s linux-build/appimage/com.ayab_knitting.ayab.desktop .
 
       - name: Add metadata
         run: |
-          cd squashfs-root
           mkdir -p usr/share/metainfo/
           rm -f usr/share/metainfo/*.appdata.xml
           cp linux-build/appimage/ayab.appdata.xml usr/share/metainfo/
