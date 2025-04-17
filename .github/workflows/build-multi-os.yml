@@ -147,3 +147,4 @@ jobs:
         with:
           name: AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
           path: AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
+          if-no-files-found: error
