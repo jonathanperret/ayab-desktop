@@ -121,7 +121,6 @@ jobs:
         run: |
           yum install -qy appstream
           VERSION=${{steps.vars.outputs.tag}} $HOME/.local/bin/.appimagetool.appdir.$(uname -i)/AppRun squashfs-root
-          mv ayab-*.AppImage ayab-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
 
       - name: Attach AppImage to release
         uses: ncipollo/release-action@v1
