@@ -121,12 +121,11 @@ jobs:
 
       - name: Convert to AppImage
         run: |
-          wget -c https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep appimagetool-.*-${{ env.ARCH }}.AppImage | head -n 1 | cut -d '"' -f 2)
-          chmod +x appimagetool-*-${{ env.ARCH }}.AppImage
-          chmod 755 squashfs-root
-          sudo apt-get install -qy appstream
-          VERSION=${{steps.vars.outputs.tag}} ./appimagetool-*-${{ env.ARCH }}.AppImage squashfs-root/
-          mv ayab-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
+          yum install -qy appstream
+          appdir=$PWD
+          cd /tmp
+          VERSION=${{steps.vars.outputs.tag}} $HOME/.local/bin/.appimagetool.appdir.$(uname -i)/AppRun "$appdir"
+          mv ayab-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage $appdir/AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
 
       - name: Attach AppImage to release
         uses: ncipollo/release-action@v1
