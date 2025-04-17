@@ -111,7 +111,7 @@ jobs:
 
       - name: Create desktop file
         run: |
-          rm -f *.desktop usr/share/applications/
+          rm -rf *.desktop usr/share/applications/
           ln -s linux-build/appimage/com.ayab_knitting.ayab.desktop .
 
       - name: Add metadata
