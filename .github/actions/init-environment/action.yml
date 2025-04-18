@@ -10,21 +10,12 @@ outputs:
   python-minor:
     description: "Python version without patch number (e.g. 3.11)"
     value: ${{steps.vars.outputs.python-minor}}
-  python-appimage:
-    description: "Python AppImage filename for Linux builds"
-    value: ${{steps.vars.outputs.python-appimage}}
   firmware-url:
     description: "Download URL for the firmware hex file"
     value: ${{steps.firmware.outputs.firmware-url}}
 runs:
   using: "composite"
   steps:
-    # - name: Set up Python ${{ env.PYTHON_VERSION }}
-    #   id: py
-    #   uses: actions/setup-python@v5
-    #   with:
-    #     python-version: ${{ env.PYTHON_VERSION }}
-
     - name: Set variables
       id: vars
       shell: bash

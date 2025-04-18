@@ -29,6 +29,11 @@ jobs:
           submodules: recursive
           fetch-depth: 0 # necessary for `git describe`
 
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
       - uses: ./.github/actions/init-environment
         id: vars
 
@@ -130,6 +135,11 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0 # necessary for `git describe`
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - uses: ./.github/actions/init-environment
         id: vars
