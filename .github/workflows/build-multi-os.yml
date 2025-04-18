@@ -296,18 +296,17 @@ jobs:
       - name: Build AppImage of Python designed for manylinux
         shell: bash -xeo pipefail {0}
         run: |
-          arch=$(uname -i)
           # Create directory where python-appimage will look for its tools
           mkdir -p $HOME/.local/bin
 
           # Install working appimagetool
-          curl -SsLO "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -i).AppImage"
+          curl -SsLO "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage"
           chmod +x appimagetool*.AppImage
           ./appimagetool*.AppImage --appimage-extract
-          mv squashfs-root $HOME/.local/bin/.appimagetool.appdir.$(uname -i)
+          mv squashfs-root $HOME/.local/bin/.appimagetool.appdir.$(uname -m)
           
           # Install working patchelf
-          curl -SsLO "https://github.com/NixOS/patchelf/releases/download/0.14.3/patchelf-0.14.3-$(uname -i).tar.gz"
+          curl -SsLO "https://github.com/NixOS/patchelf/releases/download/0.14.3/patchelf-0.14.3-$(uname -m).tar.gz"
           tar -C $HOME/.local -xvzf patchelf*.gz ./bin/patchelf
 
           # Install python-appimage
@@ -369,7 +368,7 @@ jobs:
       - name: Convert to AppImage
         run: |
           yum install -qy appstream
-          VERSION=${{steps.vars.outputs.tag}} $HOME/.local/bin/.appimagetool.appdir.$(uname -i)/AppRun squashfs-root
+          VERSION=${{steps.vars.outputs.tag}} $HOME/.local/bin/.appimagetool.appdir.$(uname -m)/AppRun squashfs-root
           ls -l
 
       - name: Attach AppImage to release
