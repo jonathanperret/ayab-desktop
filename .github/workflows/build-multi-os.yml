@@ -21,7 +21,7 @@ env:
 jobs:
   # see https://github.com/AppImage/AppImageKit/wiki/Bundling-Python-apps
   build-appimage:
-    name: Create and upload Linux AppImage release
+    name: linux-appimage
     strategy:
       fail-fast: false
       matrix:
