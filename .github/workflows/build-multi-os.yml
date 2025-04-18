@@ -318,6 +318,12 @@ jobs:
           # Extract AppImage
           ./python3*.AppImage --appimage-extract
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-appimage-${{ matrix.arch }}.AppImage
+          path: python*.AppImage
+          if-no-files-found: error
+
       - name: Add AppDir subdirectories to PATH
         run: |
           echo "$PWD/squashfs-root/usr/bin" >> $GITHUB_PATH
