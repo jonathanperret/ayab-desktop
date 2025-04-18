@@ -22,13 +22,15 @@ jobs:
   # see https://github.com/AppImage/AppImageKit/wiki/Bundling-Python-apps
   build-appimage:
     name: Create and upload Linux AppImage release
-    # runs-on: ubuntu-22.04
-    runs-on: ubuntu-22.04-arm
-    env:
-      # ARCH: x86_64
-      ARCH: aarch64
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - x86_64
+          - aarch64
+    runs-on: ubuntu-22.04${{ matrix.arch == 'aarch64' && '-arm' || '' }}
     container:
-      image: quay.io/pypa/manylinux_2_34_aarch64:2025.02.28-1
+      image: quay.io/pypa/manylinux_2_34_${{ matrix.arch }}:2025.02.28-1
     steps:
       - name: Checkout repo into AppDir
         uses: actions/checkout@v4
@@ -132,7 +134,7 @@ jobs:
           tag: ${{ steps.vars.outputs.tag }}
           commit: ${{ steps.vars.outputs.sha }}
           allowUpdates: true
-          artifacts: AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
+          artifacts: AYAB-${{ steps.vars.outputs.tag }}-${{ matrix.arch }}.AppImage
           artifactContentType: application/AppImage
           replacesArtifacts: true
           # Default to draft and prerelease to let a human check the release before it goes live
@@ -146,6 +148,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
-          path: AYAB-${{ steps.vars.outputs.tag }}-${{ env.ARCH }}.AppImage
+          name: AYAB-${{ steps.vars.outputs.tag }}-${{ matrix.arch }}.AppImage
+          path: AYAB-${{ steps.vars.outputs.tag }}-${{ matrix.arch }}.AppImage
           if-no-files-found: error
