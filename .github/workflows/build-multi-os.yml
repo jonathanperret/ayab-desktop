@@ -375,7 +375,6 @@ jobs:
         run: |
           yum install -qy appstream
           VERSION=${{steps.vars.outputs.tag}} $HOME/.local/bin/.appimagetool.appdir.$(uname -m)/AppRun squashfs-root
-          ls -l
 
       - name: Attach AppImage to release
         uses: ncipollo/release-action@v1
