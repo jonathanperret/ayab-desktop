@@ -281,13 +281,11 @@ jobs:
           cp -r !(git) git
           shopt -u dotglob
 
-      - name: Download AppImage of Python designed for manylinux
-        run: wget -c https://github.com/niess/python-appimage/releases/download/python${{steps.vars.outputs.python-minor}}/${{steps.vars.outputs.python-appimage}}
-
-      - name: Extract the AppImage
+      - name: Build AppImage (extracted) of Python
         run: |
-          chmod +x ${{steps.vars.outputs.python-appimage}}
-          ./${{steps.vars.outputs.python-appimage}} --appimage-extract
+          python -m pip install python-appimage
+          python -m python_appimage build manylinux 2_28_x86_64:2025.05.24-1 cp311-cp311 --no-packaging
+          mv python3*manylinux* squashfs-root
 
       - name: Move repo
         run: mv git/* squashfs-root
