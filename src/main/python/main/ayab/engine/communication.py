@@ -33,7 +33,6 @@ from ..machine import Machine
 from .websocketserial import WebsocketSerial
 
 import logging
-import pprint
 
 
 class Token(Enum):
@@ -48,6 +47,7 @@ class Token(Enum):
     reqLine = 0x82
     cnfLine = 0x42
     indState = 0x84
+    indRowCounterHit = 0x85
     helpCmd = 0x25
     sendCmd = 0x26
     beepCmd = 0x27
@@ -211,9 +211,7 @@ class Communication(object):
             if msg[0] == t.value:
                 return msg, t, msg[1]
         # fallthrough
-        self.logger.debug("unknown message: ")  # drop crlf
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(msg[1:-1].decode())
+        self.logger.debug("unknown message: %s", msg[1:-1])
         return msg, Token.unknown, 0
 
     def read_API6(self) -> Optional[bytes]:
