@@ -121,6 +121,8 @@ class CommunicationMock(Communication):
                     sleep(1)  # wait for knitting progress dialog to update
             else:
                 self.__started_row = True
+                indCounter = bytes([Token.indRowCounterHit.value, 0])
+                self.rx_msg_list.append(indCounter)
         if len(self.rx_msg_list) > 0:
             return self.parse_API6(self.rx_msg_list.pop(0))  # FIFO
         # else

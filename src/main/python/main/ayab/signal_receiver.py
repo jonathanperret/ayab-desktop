@@ -58,6 +58,7 @@ class SignalReceiver(QObject):
     new_image_flag = Signal()
     bad_config_flag = Signal()
     knitting_starter = Signal()
+    row_counter_hit = Signal()
     operation_finisher = Signal(Operation)
     hw_test_starter = Signal(Control)
     hw_test_writer = Signal(str)
@@ -81,3 +82,4 @@ class SignalReceiver(QObject):
         self.operation_finisher.connect(parent.finish_operation)
         self.hw_test_starter.connect(parent.hw_test.open)
         self.hw_test_writer.connect(parent.hw_test.output)
+        self.row_counter_hit.connect(parent.handle_row_counter_hit)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="Ui_MainWindow">
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,7 +15,45 @@
   </property>
   <widget class="QWidget" name="central_widget">
    <layout class="QGridLayout" name="grid_layout">
-    <item row="0" column="0" rowspan="3">
+    <item row="8" column="1" rowspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+     <widget class="QSpinBox" name="rowCounter">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>129</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>80</pointsize>
+        <bold>true</bold>
+        <underline>false</underline>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
+      <property name="frame">
+       <bool>true</bool>
+      </property>
+      <property name="wrapping">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="accelerated">
+       <bool>true</bool>
+      </property>
+      <property name="maximum">
+       <number>999</number>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="10">
      <layout class="QVBoxLayout" name="image_side_panel">
       <property name="spacing">
        <number>6</number>
@@ -46,13 +84,12 @@
             <property name="font">
              <font>
               <pointsize>14</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
               <kerning>true</kerning>
              </font>
             </property>
             <property name="text">
-             <string></string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -63,12 +100,11 @@
           <property name="font">
            <font>
             <pointsize>14</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
           <property name="text">
-           <string></string>
+           <string/>
           </property>
          </widget>
         </item>
@@ -77,7 +113,7 @@
       <item>
        <widget class="QLabel" name="label_notifications">
         <property name="text">
-         <string></string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -86,7 +122,7 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="1" rowspan="3">
+    <item row="0" column="1" rowspan="8">
      <widget class="QScrollArea" name="assistant_dock">
       <property name="enabled">
        <bool>true</bool>
@@ -249,7 +285,7 @@
            <item>
             <widget class="QPushButton" name="cancel_button">
              <property name="enabled">
-              <bool>False</bool>
+              <bool>false</bool>
              </property>
              <property name="text">
               <string>Cancel</string>

@@ -168,6 +168,8 @@ class Control(SignalSender):
             self.__log_cnfInfo(msg)
         elif token == Token.indState:
             self.status.parse_device_state_API6(param, msg)
+        elif token == Token.indRowCounterHit:
+            self.emit_row_counter_hit()
         elif token == Token.testRes:
             if len(msg) > 0:
                 self.emit_hw_test_writer(msg[1:].decode())

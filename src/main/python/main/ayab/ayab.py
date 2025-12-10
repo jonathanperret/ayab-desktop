@@ -194,3 +194,7 @@ class GuiMain(QMainWindow):
         if log:
             logging.info("Notification: " + text)
         self.ui.label_notifications.setText(text)
+
+    def handle_row_counter_hit(self) -> None:
+        """Handle the row counter hit event."""
+        self.ui.rowCounter.setValue(self.ui.rowCounter.value() + 1)

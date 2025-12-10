@@ -93,6 +93,9 @@ class SignalSender(object):
     def emit_knitting_starter(self) -> None:
         self.__signal_receiver.knitting_starter.emit()
 
+    def emit_row_counter_hit(self) -> None:
+        self.__signal_receiver.row_counter_hit.emit()
+
     def emit_operation_finisher(self, operation: Operation) -> None:
         self.__signal_receiver.operation_finisher.emit(operation)
 
