@@ -39,6 +39,7 @@ jobs:
           choco install vcredist2010 # fixes dependency on msvcr100.dll
           python -m pip install --upgrade pip
           python -m pip install -r requirements.build.txt
+          python -m pip install --no-deps 'fbs @ git+https://github.com/AllYarnsAreBeautiful/fbs@1.2.1-pyqt6'
           python -m pip install -r windows-build\windows_build_requirements.txt
 
       - name: Convert UI and translation files
@@ -160,6 +161,7 @@ jobs:
           python -m pip install tmp-wheel/*.whl
 
           python -m pip install --no-binary charset_normalizer -r requirements.build.txt
+          python -m pip install --no-deps 'fbs @ git+https://github.com/AllYarnsAreBeautiful/fbs@1.2.1-pyqt6'
 
       - name: Convert UI and translation files
         run: |
@@ -275,6 +277,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
           python -m pip install -r requirements.build.txt
+          python -m pip install --no-deps 'fbs @ git+https://github.com/AllYarnsAreBeautiful/fbs@1.2.1-pyqt6'
 
       - name: Convert UI and translation files
         run: |
@@ -304,6 +307,7 @@ jobs:
           sudo apt-get install -y avrdude libasound2-dev
           ./AppRun -m pip install --upgrade pip
           ./AppRun -m pip install -r requirements.build.txt
+          ./AppRun -m pip install --no-deps 'fbs @ git+https://github.com/AllYarnsAreBeautiful/fbs@1.2.1-pyqt6'
 
       - name: Add AppDir subdirectories to PATH
         run: |
