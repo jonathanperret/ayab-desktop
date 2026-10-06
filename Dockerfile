@@ -6,7 +6,14 @@ ENV QT_QPA_PLATFORM=xcb
 ENV DISPLAY=host.docker.internal:0
 
 RUN yum install -qy double-conversion compat-openssl11 libxkbcommon-x11 \
-        xcb-util-cursor xcb-util-keysyms xcb-util-wm alsa-plugins-pulseaudio
+    xcb-util-cursor xcb-util-keysyms xcb-util-wm alsa-plugins-pulseaudio \
+    gtk3
+
+# XQuartz does not propagate the macOS appearance to Linux Qt applications.
+ENV QT_QPA_PLATFORMTHEME=gtk3
+
+# To enable dark mode, run with:
+#     docker run -e GTK_THEME=Adwaita:dark ...
 
 # Expects a running PulseAudio server on the host machine
 # On MacOS this can be achieved with:
