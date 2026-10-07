@@ -1,0 +1,13 @@
+.git
+.direnv
+.venv
+venv
+__pycache__
+*.py[cod]
+**/*_gui.py
+**/*_rc.py
+.mypy_cache
+.pytest_cache
+
+/build
+/target
