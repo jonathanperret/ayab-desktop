@@ -22,6 +22,9 @@
 	<string>${version}</string>
 	<key>CFBundleName</key>
 	<string>${app_name}</string>
+	<!-- Keep in sync with the macOS minimum of the PySide6 wheels: -->
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
 	<!-- Enable Retina support on OS X: -->
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
