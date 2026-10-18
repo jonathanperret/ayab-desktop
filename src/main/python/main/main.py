@@ -4,7 +4,7 @@ from fbs_runtime.application_context.PySide6 import ApplicationContext
 import sys
 from os import path
 import logging
-from distutils.dir_util import copy_tree
+from shutil import copytree
 
 from PySide6.QtCore import QCoreApplication, QTranslator, QLocale, QSettings
 
@@ -47,7 +47,7 @@ class AppContext(ApplicationContext):  # type: ignore # 1. Subclass ApplicationC
     def make_user_directory(self) -> None:
         self.userdata_path = path.expanduser(path.join("~", "AYAB"))
         # copy patterns into user directory
-        copy_tree(self.get_resource("patterns"), self.userdata_path)
+        copytree(self.get_resource("patterns"), self.userdata_path, dirs_exist_ok=True)
 
     def configure_logger(self) -> None:
         logfile = path.join(self.userdata_path, "ayab_log.txt")

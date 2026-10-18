@@ -19,7 +19,7 @@ For older systems, use [AYAB 1.0.0](https://github.com/AllYarnsAreBeautiful/ayab
 
 ## Running from Source & Development
 
-The AYAB desktop software runs using Python 3.11.  
+The AYAB desktop software runs using Python 3.14.
 The Python module dependencies are split across **runtime dependencies**, which are in *requirements.build.txt* and **development dependencies**, found in *requirements.txt*.
 
 This repository uses [pre-commit](https://pre-commit.com/) hooks.
@@ -38,12 +38,12 @@ To build or run the application, you will also need the system libraries require
 ```bash
     sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt update
-    sudo apt install python3.11 python3.11-dev python3.11-venv
+    sudo apt install python3.14 python3.14-dev python3.14-venv
     sudo apt install avrdude qt6-tools-dev-tools build-essential
 ```
 #### openSUSE
 ```bash
-    sudo zypper install python311 python311-pip python311-virtualenv python311-devel
+    sudo zypper install python314 python314-pip python314-virtualenv python314-devel
     sudo zypper install libasound2 avrdude qt6-tools-dev-tools build-essential
 ```
 #### All Distributions
@@ -74,7 +74,7 @@ Now you can download the git repository with:
 ```
 Next, create a virtual environment for AYAB:
 ```ps
-    conda create --name ayab -c conda-forge python=3.11 pip
+    conda create --name ayab -c conda-forge python=3.14 pip
 ```
 Activate the virtual environment. The command prompt should now display
 `(ayab)` at the beginning of each line.
@@ -99,7 +99,7 @@ You will also need the Xcode command line tools:
 ```bash
     xcode-select --install
 ```
-Install python from [the official universal2 installer](https://www.python.org/ftp/python/3.11.8/python-3.11.8-macos11.pkg). (Conda does not produce universal binaries)  
+Install Python from the [official universal2 installer](https://www.python.org/ftp/python/3.14.8/python-3.14.8-macos11.pkg). (Conda does not produce universal binaries.)
 
 If you encounter the pip `SSL:TLSV1_ALERT_PROTOCOL_VERSION` problem:
 ```bash
@@ -115,7 +115,7 @@ Once platform-specific setup is complete, download the git repository:
 ```
 Create a virtual environment for AYAB:
 ```bash
-    python3.11 -m venv .venv 
+    python3.14 -m venv .venv
 ```
 Now activate the virtual environment. The command prompt should now display
 `(.venv)` at the beginning of each line.
