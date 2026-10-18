@@ -142,10 +142,6 @@ jobs:
           python -m pip download --only-binary=:all: --platform macosx_11_0_arm64 "$(grep Pillow requirements.build.txt)"
           delocate-fuse Pillow*arm* Pillow*x86* -w tmp-wheel/
 
-          python -m pip download --only-binary=:all: --platform macosx_10_9_x86_64 "$(grep simpleaudio requirements.build.txt)"
-          python -m pip download --only-binary=:all: --platform macosx_11_0_arm64 "$(grep simpleaudio requirements.build.txt)"
-          delocate-fuse simpleaudio*arm* simpleaudio*x86* -w tmp-wheel/
-
           python -m pip download --dest tmp-wheel/ --only-binary=:all: --platform=macosx_10_9_universal2 "$(grep bitarray requirements.build.txt)"
 
           python -m pip download --only-binary=:all: --platform macosx_10_9_x86_64 "$(grep zeroconf requirements.build.txt)"
@@ -272,7 +268,7 @@ jobs:
 
       - name: Install Python modules
         run: |
-          sudo apt-get install -y avrdude libasound2-dev
+          sudo apt-get install -y avrdude
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
           python -m pip install -r requirements.build.txt
@@ -308,7 +304,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd squashfs-root
-          sudo apt-get install -y avrdude libasound2-dev
+          sudo apt-get install -y avrdude
           ./AppRun -m pip install -r requirements.build.txt
 
       - name: Add AppDir subdirectories to PATH

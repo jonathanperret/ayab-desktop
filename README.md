@@ -39,12 +39,12 @@ To build or run the application, you will also need the system libraries require
     sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt update
     sudo apt install python3.11 python3.11-dev python3.11-venv
-    sudo apt install libasound2-dev avrdude qt6-tools-dev-tools build-essential
+    sudo apt install avrdude qt6-tools-dev-tools build-essential
 ```
 #### openSUSE
 ```bash
     sudo zypper install python311 python311-pip python311-virtualenv python311-devel
-    sudo zypper install libasound2 alsa-devel avrdude qt6-tools-dev-tools build-essential
+    sudo zypper install libasound2 avrdude qt6-tools-dev-tools build-essential
 ```
 #### All Distributions
 

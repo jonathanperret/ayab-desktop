@@ -22,7 +22,8 @@
 from __future__ import annotations
 from os import path
 
-import simpleaudio as sa
+from PySide6.QtCore import QUrl
+from PySide6.QtMultimedia import QSoundEffect
 
 from typing import TYPE_CHECKING
 
@@ -32,31 +33,28 @@ if TYPE_CHECKING:
 
 class AudioPlayer:
     def __init__(self, gui: GuiMain):
+        self.__gui = gui
         self.__dir = gui.app_context.get_resource("assets")
         self.__prefs = gui.prefs
-        self.__cache: dict[str, sa.WaveObject] = {}
+        self.__cache: dict[str, QSoundEffect] = {}
 
     def play(self, sound: str) -> None:
         """Play audio."""
         if self.__prefs.value("quiet_mode"):
             return
         # else
-        wave_obj = self.__wave(sound)
-        if wave_obj is None:
-            return
-        # else
-        wave_obj.play()
+        self.__wave(sound).play()
 
-    def __wave(self, sound: str) -> sa.WaveObject | None:
+    def __wave(self, sound: str) -> QSoundEffect:
         """Get and cache audio."""
         if sound not in self.__cache:
-            wave_object = self.__load_wave(sound)
-            if wave_object is None:
-                return None
-            self.__cache[sound] = wave_object
+            self.__cache[sound] = self.__load_wave(sound)
         return self.__cache[sound]
 
-    def __load_wave(self, sound: str) -> sa.WaveObject | None:
+    def __load_wave(self, sound: str) -> QSoundEffect:
         """Get audio from file."""
         filename = path.join(self.__dir, sound + ".wav")
-        return sa.WaveObject.from_wave_file(filename)
+        # Parented to the main window so it is destroyed before the application.
+        effect = QSoundEffect(self.__gui)
+        effect.setSource(QUrl.fromLocalFile(filename))
+        return effect
