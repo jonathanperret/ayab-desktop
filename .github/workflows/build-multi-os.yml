@@ -152,7 +152,7 @@ jobs:
 
           python -m pip install tmp-wheel/*.whl
 
-          python -m pip install --no-binary charset_normalizer -r requirements.build.txt
+          python -m pip install -r requirements.build.txt
 
       - name: Convert UI and translation files
         run: |
