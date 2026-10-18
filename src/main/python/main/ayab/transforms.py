@@ -37,12 +37,12 @@ class Transform(Image.Image):
     @staticmethod
     def rotate_left(image: Image.Image, args: None = None) -> Image.Image:
         # TODO crop width if it exceeds the maximum after transform
-        return image.transpose(Image.ROTATE_90)
+        return image.transpose(Image.Transpose.ROTATE_90)
 
     @staticmethod
     def rotate_right(image: Image.Image, args: None = None) -> Image.Image:
         # TODO crop width if it exceeds the maximum after transform
-        return image.transpose(Image.ROTATE_270)
+        return image.transpose(Image.Transpose.ROTATE_270)
 
     @staticmethod
     def invert(image: Image.Image, args: None = None) -> Image.Image:
@@ -55,11 +55,11 @@ class Transform(Image.Image):
 
     @staticmethod
     def hflip(image: Image.Image, args: None = None) -> Image.Image:
-        return image.transpose(Image.FLIP_LEFT_RIGHT)
+        return image.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
 
     @staticmethod
     def vflip(image: Image.Image, args: None = None) -> Image.Image:
-        return image.transpose(Image.FLIP_TOP_BOTTOM)
+        return image.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
     @staticmethod
     def repeat(image: Image.Image, args: tuple[int, int]) -> Image.Image:
@@ -120,7 +120,7 @@ class Transform(Image.Image):
         old_w, old_h = image.size
         new_h = old_h * args[0]  # vertical
         new_w = old_w * args[1]  # horizontal
-        return image.resize((new_w, new_h), Image.BOX)
+        return image.resize((new_w, new_h), Image.Resampling.BOX)
 
     def zoom_in(self) -> None:
         # allows menu action

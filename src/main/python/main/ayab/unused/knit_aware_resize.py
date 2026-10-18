@@ -32,9 +32,9 @@ def resize_image(
     width, height = image.size
     resized_image = image.transform(
         (int(width_proportion * width), int(height_proportion * height)),
-        Image.AFFINE,
+        Image.Transform.AFFINE,
         (1.0 / width_proportion, 0, 0, 0, 1.0 / height_proportion, 0),
-        Image.NEAREST,
+        Image.Resampling.NEAREST,
     )
     return resized_image
 

@@ -29,7 +29,9 @@ from ..machine import Machine
 class Pattern(object):
     def __init__(self, image: Image.Image, config: OptionsTab, num_colors: int = 2):
         self.__pattern = (
-            image.transpose(Image.FLIP_LEFT_RIGHT) if config.auto_mirror else image
+            image.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+            if config.auto_mirror
+            else image
         )
         self.__num_colors = num_colors
         self.__alignment = Alignment.CENTER
@@ -65,6 +67,14 @@ class Pattern(object):
         # Limit number of colors in pattern
         # self.__pattern = self.__pattern.quantize(num_colors, dither=None)
         self.__pattern = self.__pattern.quantize(self.__num_colors)
+        # Since Pillow 10.1, the palette only holds the colors actually used,
+        # which may be fewer than requested. Pad it with black, as older
+        # Pillow did, so that remapping keeps palette indices aligned.
+        palette = self.__pattern.getpalette() or []
+        if len(palette) < 3 * self.__num_colors:
+            self.__pattern.putpalette(
+                palette + [0] * (3 * self.__num_colors - len(palette))
+            )
 
         # Order colors most-frequent first
         # NB previously they were ordered lightest-first

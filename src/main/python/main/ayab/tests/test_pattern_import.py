@@ -35,7 +35,7 @@ class TestPatternImport(unittest.TestCase):
 
         assert image.mode == "RGB"
         assert image.size == (3, 2)
-        assert list(image.getdata()) == EXPECTED_DAK_PIXELS
+        assert list(image.get_flattened_data()) == EXPECTED_DAK_PIXELS
 
     def test_designaknit_stp(self):
         image = StpPatternConverter(debug=False).pattern2im(
@@ -44,7 +44,7 @@ class TestPatternImport(unittest.TestCase):
 
         assert image.mode == "RGB"
         assert image.size == (3, 2)
-        assert list(image.getdata()) == EXPECTED_DAK_PIXELS
+        assert list(image.get_flattened_data()) == EXPECTED_DAK_PIXELS
 
     def test_dr_halo_cut(self):
         image = CutPatternConverter(debug=False).pattern2im(
@@ -53,7 +53,7 @@ class TestPatternImport(unittest.TestCase):
 
         assert image.mode == "RGB"
         assert image.size == (3, 2)
-        assert list(image.getdata()) == [
+        assert list(image.get_flattened_data()) == [
             (64, 64, 64),
             (64, 64, 64),
             (64, 64, 64),

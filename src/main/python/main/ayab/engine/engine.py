@@ -168,7 +168,7 @@ class Engine(SignalSender, QDockWidget):
         self.__logger.debug(self.config.as_dict())
 
         # start to knit with the bottom first
-        image = image.transpose(Image.FLIP_TOP_BOTTOM)
+        image = image.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
         # TODO: detect if previous conf had the same
         # image to avoid re-generating.

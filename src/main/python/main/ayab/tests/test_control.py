@@ -262,6 +262,8 @@ class TestControl(unittest.TestCase):
         im = Image.new("P", (40, 3), 1)
         im1 = Image.new("P", (40, 1), 0)
         im.paste(im1, (0, 0))
+        # Pillow >= 10.1 no longer gives new "P" images a default palette
+        im.putpalette([0, 0, 0, 1, 1, 1])
         pattern = Pattern(im, Config(Machine(0), Mode.SINGLEBED), 2)
         pattern.alignment = Alignment.LEFT
         assert pattern.pat_start_needle == 0
