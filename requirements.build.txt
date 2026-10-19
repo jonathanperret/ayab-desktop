@@ -5,7 +5,7 @@ PyInstaller==6.17.0
 pyinstaller-hooks-contrib==2026.7
 Pillow==13.0.0
 pyserial==3.5
-sliplib==0.6.2
+sliplib==0.7.2
 bitarray==3.12.2
 semver==3.0.2
 wakepy==0.10.1

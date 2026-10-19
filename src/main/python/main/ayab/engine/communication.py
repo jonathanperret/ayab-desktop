@@ -35,6 +35,9 @@ from .websocketserial import WebsocketSerial
 import logging
 import pprint
 
+# Preserve sliplib 0.6's leading END byte and AYAB's established wire format.
+sliplib.config.USE_LEADING_END_BYTE = True
+
 
 class Token(Enum):
     unknown = -2
@@ -76,7 +79,6 @@ class Communication(object):
         self.logger = logging.getLogger(type(self).__name__)
         self.__ser = serial
         self.__driver = sliplib.Driver()
-        self.rx_msg_list: list[bytes] = list()
 
     def __del__(self) -> None:
         """Handle behaviour on deletion by closing the serial port connection."""
@@ -222,30 +224,25 @@ class Communication(object):
         if self.__ser is None:
             return None
 
-        # If we already have messages pending from previous serial reads,
-        # do not bother waiting on the serial port. The data will be safely
-        # buffered by the OS until we have consumed the messages already
-        # received.
-        if len(self.rx_msg_list) == 0:
-            # This will block until the timeout configured in the Serial constructor
-            # if no data is available (to avoid busy-waiting), but return as soon as
-            # a single byte is available to read.
-            data = self.__ser.read(1)
+        message: bytes | None = self.__driver.get(block=False)
+        if message is not None:
+            return message
 
-            # More bytes may have become available simultaneously: grab them now.
-            if self.__ser.in_waiting > 0:
-                data = data + self.__ser.read(self.__ser.in_waiting)
+        # This will block until the timeout configured in the Serial constructor
+        # if no data is available (to avoid busy-waiting), but return as soon as
+        # a single byte is available to read.
+        data = self.__ser.read(1)
 
-            # Send everything we received to the SLIP decoder and enqueue any messages
-            # it extracted from the data so far.
-            if len(data) > 0:
-                self.rx_msg_list.extend(self.__driver.receive(data))
+        # More bytes may have become available simultaneously: grab them now.
+        if self.__ser.in_waiting > 0:
+            data = data + self.__ser.read(self.__ser.in_waiting)
 
-        # Now, return the oldest message we have in the queue.
-        if len(self.rx_msg_list) > 0:
-            return self.rx_msg_list.pop(0)  # FIFO
+        if len(data) == 0:
+            return None
 
-        return None
+        self.__driver.receive(data)
+        message = self.__driver.get(block=False)
+        return message
 
     def write_API6(self, msg: bytes | bytearray) -> None:
         if self.__ser is None:
