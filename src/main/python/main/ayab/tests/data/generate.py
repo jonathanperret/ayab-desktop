@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 WIDTH = 3
 HEIGHT = 2
 PATTERN = bytes((0, 1, 0, 0x83, 1))
@@ -75,7 +74,7 @@ def stp_xor_key(data: bytes) -> bytearray:
 def make_pat() -> bytes:
     data = bytearray(0x165)
     data[0:3] = b"D4C"
-    data[3:0x83] = b"\xFF" * 0x80
+    data[3:0x83] = b"\xff" * 0x80
     data[3] = 0
     data[4] = 1
     data[0x105:0x108] = bytes(reversed(RED))
@@ -83,7 +82,7 @@ def make_pat() -> bytes:
     set_word(data, 0x13A, WIDTH)
     set_word(data, 0x13C, HEIGHT)
     data.extend(PATTERN)
-    data.extend(b"\x00\xFE")
+    data.extend(b"\x00\xfe")
     return bytes(data)
 
 
@@ -92,7 +91,7 @@ def make_stp() -> bytes:
     data[0:3] = b"D7c"
     set_word(data, 3, WIDTH)
     set_word(data, 5, HEIGHT)
-    xor_key = stp_xor_key(data)
+    xor_key = stp_xor_key(bytes(data))
 
     data.extend(HEIGHT.to_bytes(2, "little"))
     data.extend(len(PATTERN).to_bytes(2, "little"))
@@ -116,7 +115,7 @@ def make_cut() -> bytes:
     data.extend(WIDTH.to_bytes(2, "little"))
     data.extend(HEIGHT.to_bytes(2, "little"))
     data.extend(b"\x00\x00")
-    data.extend(b"\x05\x00\x03\x00\x7F\xFF\x00")
+    data.extend(b"\x05\x00\x03\x00\x7f\xff\x00")
     data.extend(b"\x03\x00\x83\x40\x00")
     return bytes(data)
 

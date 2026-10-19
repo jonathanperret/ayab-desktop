@@ -203,7 +203,7 @@ class Scene(QGraphicsView):
 
     def wheelEvent(self, event: QWheelEvent) -> None:
         """Zoom the pattern upon mouse wheel event"""
-        self.zoom = event  # type: ignore
+        self.zoom = event
 
     @property
     def zoom(self) -> float:

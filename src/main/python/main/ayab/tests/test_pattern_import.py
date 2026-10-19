@@ -15,7 +15,6 @@ from ..pattern_import import (
     StpPatternConverter,
 )
 
-
 DATA_DIR = Path(__file__).with_name("data")
 EXPECTED_DAK_PIXELS = [
     (0, 0, 255),

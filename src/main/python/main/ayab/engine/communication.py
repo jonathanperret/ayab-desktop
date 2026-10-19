@@ -116,10 +116,7 @@ class Communication(object):
                 self.__ser = None
                 self.logger.info("Closing serial port successful.")
             except Exception:
-                self.logger.warning(
-                    "Closing serial port failed. \
-                                      Was it ever open?"
-                )
+                self.logger.warning("Closing serial port failed. Was it ever open?")
 
     # NB this method must be the same for all API versions
     def req_info(self) -> None:

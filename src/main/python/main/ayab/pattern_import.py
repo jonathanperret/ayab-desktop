@@ -197,9 +197,10 @@ class STPBlock:
         self.height = getWordAt(buffer, start)
         self.size = getWordAt(buffer, start + 2)
         if xorkey is not None:
-            self.data: bytes = bytearray(self.size)
+            data = bytearray(self.size)
             for i in range(self.size):
-                self.data[i] = buffer[start + 4 + i] ^ xorkey[i]
+                data[i] = buffer[start + 4 + i] ^ xorkey[i]
+            self.data = bytes(data)
         else:
             self.data = buffer[start + 4 : start + 4 + self.size]
 

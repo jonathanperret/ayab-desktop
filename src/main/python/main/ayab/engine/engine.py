@@ -74,7 +74,7 @@ class Engine(SignalSender, QDockWidget):
         self.setup_ui()
         parent.ui.dock_container_layout.addWidget(self)
 
-        self.pattern: Pattern = None  # type:ignore
+        self.pattern: Pattern = None  # type: ignore
         self.control = Control(parent, self)
         self.__feedback = FeedbackHandler(parent)
         self.__logger = logging.getLogger(type(self).__name__)

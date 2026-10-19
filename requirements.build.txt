@@ -1,13 +1,13 @@
-setuptools==75.8.0
+setuptools==84.0.0
 fbs @ git+https://github.com/AllYarnsAreBeautiful/fbs@21d7cee4ef4d5fddc35173b5f00d9dc16820bfcc
 PySide6==6.12.0
-PyInstaller==6.17.0
-pyinstaller-hooks-contrib==2026.7
+PyInstaller==6.22.3
+pyinstaller-hooks-contrib==2026.8
 Pillow==13.0.0
 pyserial==3.5
 sliplib==0.7.2
 bitarray==3.12.2
-semver==3.0.2
-wakepy==0.10.1
+semver==3.1.0
+wakepy==1.0.0
 zeroconf==0.148.0
-websockets==15.0.1
+websockets==17.2

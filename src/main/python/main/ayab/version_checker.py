@@ -69,8 +69,7 @@ class VersionChecker:
                 )
                 return
 
-            data = self._version_check_reply.readAll()
-            obj = json.loads(data.data())
+            obj = json.loads(self._version_check_reply.readAll().toStdString())
             if not obj.get("draft", True) and not obj.get("prerelease", True):
                 latest_version = obj.get("tag_name")
                 url = obj.get("html_url")
