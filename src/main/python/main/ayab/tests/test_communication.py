@@ -20,7 +20,7 @@
 
 import serial
 import unittest
-from mock import patch
+from unittest.mock import patch
 
 from ..engine.communication import Communication, Token
 

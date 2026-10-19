@@ -1,7 +1,5 @@
 -r requirements.build.txt
 pytest==7.4.2
-mock==3.0.5
 pre-commit==3.6.2
 types-pyserial==3.5.0
-types-mock
 mypy==1.9.0
