@@ -70,7 +70,7 @@ class GuiMain(QMainWindow):
 
         # create UI
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # type: ignore[no-untyped-call]
 
         self.setWindowTitle(f"AYAB {utils.package_version(app_context)}")
 

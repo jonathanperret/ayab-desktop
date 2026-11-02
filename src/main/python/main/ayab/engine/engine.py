@@ -66,7 +66,7 @@ class Engine(SignalSender, QDockWidget):
         self.mdns_browser.start()
 
         self.ui = Ui_Dock()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # type: ignore[no-untyped-call]
         self.config: OptionsTab = OptionsTab(parent)
         self.config.portname = self.__read_portname()
         self.reload_settings()

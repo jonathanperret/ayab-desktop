@@ -37,7 +37,7 @@ class About(QFrame):
     def __init__(self, parent: GuiMain):
         super().__init__()
         self.__ui = Ui_AboutForm()
-        self.__ui.setupUi(self)
+        self.__ui.setupUi(self)  # type: ignore[no-untyped-call]
         self.__ui.title_label.setText(
             f"AYAB {utils.package_version(parent.app_context)}"
         )
