@@ -1,0 +1,18 @@
+#!/bin/bash
+# Stand-in for xdg-open inside AYAB Docker images. Qt on Linux opens URLs with
+# xdg-open, and Wine's winebrowser (used by Windows Qt under Wine) does too.
+# Instead of opening a browser, log the URL and show it in a dialog.
+url=${1:?usage: xdg-open URL}
+echo "xdg-open: $url" >&2
+
+# Don't let an AppImage's bundled libraries leak into the dialog tool
+unset LD_LIBRARY_PATH LD_PRELOAD PYTHONHOME PYTHONPATH
+
+message="AYAB would open this URL in a web browser:
+
+$url"
+if command -v zenity >/dev/null 2>&1; then
+    zenity --info --title="xdg-open" --no-wrap --text="$message" >/dev/null 2>&1 &
+else
+    xmessage -center -title "xdg-open" "$message" >/dev/null 2>&1 &
+fi

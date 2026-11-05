@@ -1,0 +1,28 @@
+#!/bin/bash
+# Entrypoint of the Linux image: start the VNC display, then run the given
+# command, or the given AppImage.
+#
+# Environment: DARK_MODE (default 0; 1 for the dark GTK theme), plus those of
+# start-vnc-display.
+set -eu
+
+export DISPLAY="${DISPLAY:-:99}"
+start-vnc-display
+
+if [ "${DARK_MODE:-0}" = 1 ]; then
+    export GTK_THEME=Adwaita:dark
+fi
+
+if [[ "${1:-}" == *.AppImage ]]; then
+    # Clear the AppImage magic bytes so the kernel's binfmt_misc handler for
+    # AppImages (if any) doesn't intercept it under emulation.
+    # See https://github.com/AppImage/AppImageKit/issues/828 for details.
+    appimage="$(basename "$1")"
+    cp "$1" "/tmp/$appimage"
+    dd if=/dev/zero bs=1 count=3 seek=8 conv=notrunc of="/tmp/$appimage" 2>/dev/null
+    cd /tmp
+    shift
+    exec "./$appimage" "$@"
+fi
+
+exec "$@"

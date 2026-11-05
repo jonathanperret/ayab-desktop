@@ -1,5 +1,9 @@
 # windows-build
 
+To just run AYAB (a Windows release or this checkout) under Wine, see
+`docker/README.md`: `windows-build/run-release.sh` and `windows-build/run-source.sh`
+do everything below for you.
+
 ## Cross-build with Docker
 
 The Docker build runs 64-bit Windows Python and PyInstaller under Wine. It
@@ -23,12 +27,17 @@ native Windows CI; override it with `--build-arg PYTHON_VERSION=x.y.z`.
 
 ## Run with Wine and VNC
 
-The `wine-runner` target uses Wine 10, initializes its prefix during the image
-build, and enables the Windows dark-mode preferences used by Qt. AYAB runs on
-an Openbox-managed virtual display exposed through an authenticated VNC server.
+The `wine-ayab-runner` target uses Wine 10, initializes its prefix during the
+image build, and runs AYAB on an Openbox-managed virtual display exposed through
+an authenticated VNC server.
+
+AYAB runs in light mode with Qt's native Windows style by default. Pass
+`--env DARK_MODE=1` (or set `DARK_MODE=1` for `run-release.sh`) to enable the
+Windows dark-mode preference and Qt's Fusion style, which follows it. Fusion
+does not highlight the menu bar when Alt is pressed.
 
   docker build --platform linux/amd64 \
-    --target wine-runner \
+    --target wine-ayab-runner \
     --tag ayab-windows-wine \
     --file windows-build/Dockerfile \
     --build-arg APP_VERSION=1.1.0 .
@@ -50,6 +59,36 @@ Then run the application with the VNC port bound to localhost:
 Connect a VNC client to `127.0.0.1:5901`. On macOS, open
 `vnc://127.0.0.1:5901` in Screen Sharing and enter the value supplied through
 `VNC_PASSWORD`.
+
+## Run a release installer with Wine and VNC
+
+The `wine-runner` target can run a downloaded release installer such as
+`AYAB-1.1.0-rc2.exe`. When the first argument is an NSIS installer, its payload
+is extracted with 7-Zip into `C:\Program Files\AYAB` on each launch and
+`AYAB.exe` is started with any remaining arguments. (The installer itself is a
+32-bit program that Wine fails to start under amd64 emulation on Apple
+Silicon, so it is not run.)
+
+  docker build --platform linux/amd64 \
+    --target wine-runner \
+    --tag ayab-wine-runner \
+    --file windows-build/Dockerfile .
+
+  docker run --rm --platform linux/amd64 \
+    --name ayab-wine \
+    --publish 127.0.0.1:5901:5900 \
+    --env VNC_PASSWORD=ayab \
+    --mount type=bind,source="$PWD/AYAB-1.1.0-rc2.exe",target=/AYAB-1.1.0-rc2.exe,readonly \
+    ayab-wine-runner /AYAB-1.1.0-rc2.exe
+
+`windows-build/run-release.sh AYAB-x.y.z.exe` does all of the above and opens
+a VNC viewer (TigerVNC if installed, otherwise Screen Sharing).
+
+## Opening links
+
+There is no web browser in the Docker images. Links opened by the app (e.g. in
+the About dialog) go through `xdg-open`, which in the images is
+`docker/image/xdg-open`: it logs the URL and shows it in a dialog instead.
 
 ## Run source with Wine and VNC
 
@@ -74,6 +113,9 @@ Run it from the repository root with the checkout mounted at `/workspace`:
 The container runs `fbs run` with Windows Python under Wine. Python source
 changes are picked up on the next container launch without rebuilding the
 image. Rebuild the source image only when Python or system dependencies change.
+
+`windows-build/run-source.sh` builds the image (a no-op when nothing changed),
+runs it with the checkout mounted and opens a VNC viewer, like `run-release.sh`.
 
 To build a binary from the Python script files, use PyInstaller (pip install pyinstaller) inside the virtualenv:
 

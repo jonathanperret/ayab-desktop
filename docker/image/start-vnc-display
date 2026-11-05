@@ -1,0 +1,38 @@
+#!/bin/sh
+# Start a virtual X display with a window manager and an authenticated VNC
+# server on port 5900, then return once the display is ready. Shared by the
+# Linux and Wine images.
+#
+# Environment: DISPLAY (default :99), VNC_PASSWORD (default ayab)
+set -eu
+
+: "${DISPLAY:=:99}"
+: "${VNC_PASSWORD:=ayab}"
+export DISPLAY
+
+Xvfb "$DISPLAY" -screen 0 1440x900x24 -nolisten tcp &
+
+attempts=0
+until xdpyinfo -display "$DISPLAY" >/dev/null 2>&1; do
+    attempts=$((attempts + 1))
+    if [ "$attempts" -ge 50 ]; then
+        echo "Xvfb did not become ready" >&2
+        exit 1
+    fi
+    sleep 0.1
+done
+
+openbox &
+
+# macOS VNC viewers send Option as Meta_L or Mode_switch (TigerVNC). Xvfb only
+# has Meta_L as Shift+Alt, so x11vnc would wrap a fake Shift press around it,
+# which stops Windows from treating a lone Alt press as "activate the menu
+# bar"; Mode_switch has no key at all and would be dropped. Send plain Alt.
+x11vnc \
+    -display "$DISPLAY" \
+    -remap Meta_L-Alt_L,Meta_R-Alt_R,Mode_switch-Alt_L \
+    -forever \
+    -shared \
+    -passwd "$VNC_PASSWORD" \
+    -rfbport 5900 \
+    -listen 0.0.0.0 &

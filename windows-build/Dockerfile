@@ -17,11 +17,13 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUTF8=1 \
     PYTHONUNBUFFERED=1
 
+# maim and xdotool take screenshots and send input with docker exec
 RUN dpkg --add-architecture i386 \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates curl openbox unzip wine wine32:i386 wine64 fonts-wine \
         x11-utils x11vnc xauth xvfb \
+        maim xdotool \
     && rm -rf /var/lib/apt/lists/*
 
 RUN xvfb-run -a sh -c \
@@ -76,10 +78,13 @@ RUN sed -i \
 
 FROM wine-python AS source-runner
 
-ENV WINEQT_QPA_PLATFORM=windows:darkmode=2 \
-    WINEQT_STYLE_OVERRIDE=Fusion
+# Cleared in wine-python so that build steps run Wine without a display
+ENV DISPLAY=:99
 
-COPY --chmod=0755 windows-build/run-wine.sh /usr/local/bin/run-wine
+COPY --chmod=0755 docker/image/start-vnc-display /usr/local/bin/start-vnc-display
+COPY --chmod=0755 windows-build/image/run-wine.sh /usr/local/bin/run-wine
+# Wine's winebrowser opens URLs with xdg-open; show them in a dialog instead
+COPY --chmod=0755 docker/image/xdg-open /usr/local/bin/xdg-open
 
 CMD ["run-wine", "C:\\Python311\\python.exe", "-m", "fbs", "run"]
 
@@ -114,7 +119,15 @@ RUN case "$APP_VERSION" in \
 
 FROM wine-base AS wine-runner
 
-COPY --chmod=0755 windows-build/run-wine.sh /usr/local/bin/run-wine
+# Used by run-wine to unpack release installers
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends 7zip \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --chmod=0755 docker/image/start-vnc-display /usr/local/bin/start-vnc-display
+COPY --chmod=0755 windows-build/image/run-wine.sh /usr/local/bin/run-wine
+# Wine's winebrowser opens URLs with xdg-open; show them in a dialog instead
+COPY --chmod=0755 docker/image/xdg-open /usr/local/bin/xdg-open
 
 ENTRYPOINT ["run-wine"]
 
