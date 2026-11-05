@@ -4,7 +4,7 @@
  <widget class="QMenuBar" name="menubar">
   <widget class="QMenu" name="menu_file">
    <property name="title">
-    <string>File</string>
+    <string>&amp;File</string>
    </property>
    <addaction name="action_open_image_file"/>
    <addaction name="menu_recent_files"/>
@@ -13,7 +13,7 @@
   </widget>
   <widget class="QMenu" name="menu_recent_files">
    <property name="title">
-    <string>Recent Files</string>
+    <string>&amp;Recent Files</string>
    </property>
    <addaction name="action_recent_0"/>
    <addaction name="action_recent_1"/>
@@ -23,13 +23,13 @@
   </widget>
   <widget class="QMenu" name="menu_help">
    <property name="title">
-    <string>Help</string>
+    <string>&amp;Help</string>
    </property>
    <addaction name="action_about"/>
   </widget>
   <widget class="QMenu" name="menu_tools">
    <property name="title">
-    <string>Tools</string>
+    <string>&amp;Tools</string>
    </property>
    <addaction name="action_load_AYAB_firmware"/>
    <addaction name="action_test_AYAB_device"/>
@@ -38,13 +38,13 @@
   </widget>
   <widget class="QMenu" name="menu_preferences">
    <property name="title">
-    <string>Preferences</string>
+    <string>&amp;Preferences</string>
    </property>
    <addaction name="action_set_preferences"/>
   </widget>
   <widget class="QMenu" name="menu_image_actions">
    <property name="title">
-    <string>Image Actions</string>
+    <string>&amp;Image Actions</string>
    </property>
    <action name="action_image_actions"/>
    <addaction name="action_invert"/>
@@ -64,7 +64,7 @@
   <addaction name="menu_file"/>
   <action name="action_open_image_file">
    <property name="text">
-    <string>Open Image File</string>
+    <string>&amp;Open Image File</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+O</string>
@@ -99,7 +99,7 @@
 
   <action name="action_quit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+Q</string>
@@ -110,17 +110,17 @@
   </action>
   <action name="action_load_AYAB_firmware">
    <property name="text">
-    <string>Load AYAB Firmware</string>
+    <string>&amp;Load AYAB Firmware</string>
    </property>
   </action>
   <action name="action_test_AYAB_device">
    <property name="text">
-    <string>Test AYAB Device</string>
+    <string>&amp;Test AYAB Device</string>
    </property>
   </action>
   <action name="action_knit">
    <property name="text">
-    <string>Knit</string>
+    <string>&amp;Knit</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+K</string>
@@ -128,7 +128,7 @@
   </action>
   <action name="action_cancel">
    <property name="text">
-    <string>Cancel Knitting</string>
+    <string>&amp;Cancel Knitting</string>
    </property>
    <property name="shortcut">
     <string notr="true">Escape</string>
@@ -136,7 +136,7 @@
   </action>
   <action name="action_about">
    <property name="text">
-    <string>Help – About</string>
+    <string>Help – &amp;About</string>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
@@ -149,7 +149,7 @@
   </action>
   <action name="action_invert">
    <property name="text">
-    <string>Invert</string>
+    <string>&amp;Invert</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+I</string>
@@ -157,7 +157,7 @@
   </action>
   <action name="action_stretch">
    <property name="text">
-    <string>Stretch</string>
+    <string>&amp;Stretch</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+S</string>
@@ -165,7 +165,7 @@
   </action>
   <action name="action_repeat">
    <property name="text">
-    <string>Repeat</string>
+    <string>&amp;Repeat</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+R</string>
@@ -173,7 +173,7 @@
   </action>
   <action name="action_reflect">
    <property name="text">
-    <string>Reflect</string>
+    <string>Re&amp;flect</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+M</string>
@@ -181,7 +181,7 @@
   </action>
   <action name="action_hflip">
    <property name="text">
-    <string>Horizontal Flip</string>
+    <string>&amp;Horizontal Flip</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+Up</string>
@@ -189,7 +189,7 @@
   </action>
   <action name="action_vflip">
    <property name="text">
-    <string>Vertical Flip</string>
+    <string>&amp;Vertical Flip</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+Down</string>
@@ -197,7 +197,7 @@
   </action>
   <action name="action_rotate_left">
    <property name="text">
-    <string>Rotate Left</string>
+    <string>Rotate &amp;Left</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+Left</string>
@@ -205,7 +205,7 @@
   </action>
   <action name="action_rotate_right">
    <property name="text">
-    <string>Rotate Right</string>
+    <string>Rotate Ri&amp;ght</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+Right</string>
@@ -213,7 +213,7 @@
   </action>
   <action name="action_zoom_in">
    <property name="text">
-    <string>Zoom in</string>
+    <string>&amp;Zoom in</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl++</string>
@@ -221,7 +221,7 @@
   </action>
   <action name="action_zoom_out">
    <property name="text">
-    <string>Zoom out</string>
+    <string>Zoom &amp;out</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+-</string>
@@ -229,7 +229,7 @@
   </action>
   <action name="action_set_preferences">
    <property name="text">
-    <string>Set Preferences</string>
+    <string>&amp;Set Preferences</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+P</string>

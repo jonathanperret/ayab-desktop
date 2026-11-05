@@ -43,30 +43,30 @@ MainWindow	2. Knit	2. Knit	2. Stricken	2. Prjónið	2. Lavora	2. Вязание	
 MainWindow	Test	Test	Testen	Prófa	Test	Тест	Тест	Tester		테스트	テスト	测试	Test
 MainWindow	Cancel	Cancel	Abbrechen	Hætta við	Annulla	Отмена	Скасувати	Annuler	Cancelar	취소	キャンセル	取消	Zrušit
 MainWindow	Open Knitting Project	Open Knitting Project	Projekt öffnen	Opna skrá	Apri il progetto	Начать новый проект	Відкрити в'язальний проєкт	Ouvrir un projet	Abrir proyecto de tejido	니팅 프로젝트 열기	編み物プロジェクトを開く	打开编织项目	Otevřít pletací projekt
-MenuBar	File	File	Datei	Skrá	File	Файл	Файл	Fichier	Archivo	파일	ファイル	文件	Soubor
-MenuBar	Help	Help	Hilfe	Hjálp	Aiuto	Помощь	Допомога	Aide	Ayuda	도움	ヘルプ	帮助	Nápověda
-MenuBar	Tools	Tools	Werkzeuge	Verkfæri	Strumenti	Инструменты	Інструменти	Outils	Utiles	도구		工具	Nástroje
-MenuBar	Preferences	Preferences	Einstellungen	Forstillingar	Preferenze	Персональные настройки	Налаштування	Préférences	Preferencias	환경 설정	好み	偏好设置	Předvolby
-MenuBar	Image Actions	Image Actions	Musterbearbeitung	Mynda aðgerðir	Azioni immagine	Действия с изображением	Дії з зображенням	Image	Imagen	이미지 변경	イメージアクション	图像操作	Úpravy obrázku
-MenuBar	Open Image File	Open Image File	Muster öffnen	Hlaðið myndskrá	Carica l'immagine	Загрузить изображение	Завантажити зображення	Charger une image	Cargar archivo de imagen	이미지 파일 부르기	イメージファイルの読み込み	读取图像文件	Otevřít obrázek
-MenuBar	Load AYAB Firmware	Load AYAB Firmware	AYAB Firmware aufspielen	Uppfæra AYAB hugbúnað	Carica il firmware AYAB	Загрузить прошивку AYAB	Завантажити прошивку AYAB	Chargement du firmware AYAB	Cargar el firmware AYAB	AYAB 펌웨어 설정	AYABのファームウェアをロードする	读取AYAB固件	Nahrát firmware AYAB
-MenuBar	Test AYAB Device	Test AYAB Device	AYAB-Gerät testen	Prófa AYAB tæki	Test dispositivo AYAB	Проверить устройство AYAB	Перевірити пристрій AYAB	Test de l'appareil AYAB	Probar dispositivo AYAB	AYAB 장치 테스트	AYABデバイスをテストする	测试AYAB设备	Otestovat zařízení AYAB
-MenuBar	Knit	Knit	Stricken	Prjónið	Lavora	Вязание	В'язання	Tricoter	Tejer	니트!	編む	编织	Plést
-MenuBar	Cancel Knitting	Cancel Knitting	Stricken abbrechen	Hætta við prjón	Annulla lavorazione	Отменить вязание	Скасувати в'язання	Annuler le tricot	Anular tejido	니팅 취소	編みをキャンセル	取消编织	Zrušit pletení
-MenuBar	Quit	Quit	Beenden	Hætta	Chiudi	Выход	Вихід	Quitter	Salir	끝내기	やめる	退出	Ukončit
-MenuBar	Help – About	Help – About	Hilfe – Über	Hjálp – Um	Aiuto – Informazioni	Помощь - о программе	Допомога – Про	Aide – À propos	Ayuda – Sobre	도움 - 관하여	ヘルプ - について	帮助-关于	Nápověda – O programu
-MenuBar	Invert	Invert	Invertieren	Hvolfa	Inverti	Инвертировать	Інвертувати	Inverser	Invertir	뒤집기	反転する	反色	Invertovat
-MenuBar	Stretch	Stretch	Strecken	Teygja	Allunga	Растянуть	Розтягнути	Etirer	Tramo	늘리기	ストレッチする	拉伸	Roztáhnout
-MenuBar	Repeat	Repeat	Wiederholen	Endurtaka	Ripeti	Повторить	Повторити	Répéter	Repetir	반복	繰り返す	重复	Opakovat
-MenuBar	Reflect	Reflect	Spiegeln	Endurspegla	Rifletti	Отразить	Відобразити	Refléter	Reflejar	반영	反映する	镜像	Zrcadlit
-MenuBar	Horizontal Flip	Horizontal Flip	Horizontal spiegeln	Snúa lárétt	Inverti orizzontale	Отражение по горизонтали	Відобразити по горизонталі	Retourner horizontal	Volteo horizontal	수평 뒤집기	水平反転	水平翻转	Překlopit vodorovně
-MenuBar	Vertical Flip	Vertical Flip	Vertikal spiegeln	Snúa lóðrétt	Inverti verticale	Отражение по вертикали	Відобразити по вертикалі	Retourner vertical	Volteo vertical	수직 뒤집기	垂直反転	垂直翻转	Překlopit svisle
-MenuBar	Rotate Left	Rotate Left	Links drehen	Snúa til vinstri	Ruota a sinistra	Поворот влево	Обертати ліворуч	Rotation à gauche	Girar a la izquierda	왼쪽으로 돌리기	左に回転	左转	Otočit doleva
-MenuBar	Rotate Right	Rotate Right	Rechts drehen	Snúa til hægri	Ruota a destra	Поворот вправо	Обертати праворуч	Rotation à droite	Girar a la derecha	오른쪽으로 돌리기	右に回転	右转	Otočit doprava
-MenuBar	Set Preferences	Set Preferences	Einstellungen festlegen	Setjið forstillingar	Imposta preferenze	Установить персональные настройки	Встановити налаштування	Indiquez vos préférences	Cofigurar preferencias	기본 설정	環境設定を設定する	设置偏好	Nastavit předvolby
-MenuBar	Zoom in	Zoom in	Vergrößern	Stækka	Zoom in	Приблизить	Збільшити	Zoomer	Alejar	확대	ズームイン	放大	Přiblížit
-MenuBar	Zoom out	Zoom out	Verkleinern	Minnka	Zoom out	Отдалить	Зменшити	Dézoomer	Alejar	축소	ズームアウト	缩小	Oddálit
-MenuBar	Recent Files	Recent Files				Последние файлы							
+MenuBar	&amp;File	&amp;File	&amp;Datei	&amp;Skrá	&amp;File	&amp;Файл	&amp;Файл	&amp;Fichier	&amp;Archivo	파일(&amp;F)	ファイル(&amp;F)	文件(&amp;F)	&amp;Soubor
+MenuBar	&amp;Help	&amp;Help	&amp;Hilfe	&amp;Hjálp	A&amp;iuto	П&amp;омощь	Д&amp;опомога	&amp;Aide	A&amp;yuda	도움(&amp;H)	ヘルプ(&amp;H)	帮助(&amp;H)	N&amp;ápověda
+MenuBar	&amp;Tools	&amp;Tools	&amp;Werkzeuge	&amp;Verkfæri	&amp;Strumenti	&amp;Инструменты	&amp;Інструменти	&amp;Outils	&amp;Utiles	도구(&amp;T)		工具(&amp;T)	&amp;Nástroje
+MenuBar	&amp;Preferences	&amp;Preferences	&amp;Einstellungen	&amp;Forstillingar	&amp;Preferenze	&amp;Персональные настройки	&amp;Налаштування	&amp;Préférences	&amp;Preferencias	환경 설정(&amp;P)	好み(&amp;P)	偏好设置(&amp;P)	&amp;Předvolby
+MenuBar	&amp;Image Actions	&amp;Image Actions	&amp;Musterbearbeitung	&amp;Mynda aðgerðir	&amp;Azioni immagine	&amp;Действия с изображением	&amp;Дії з зображенням	&amp;Image	&amp;Imagen	이미지 변경(&amp;I)	イメージアクション(&amp;I)	图像操作(&amp;I)	&amp;Úpravy obrázku
+MenuBar	&amp;Open Image File	&amp;Open Image File	&amp;Muster öffnen	&amp;Hlaðið myndskrá	&amp;Carica l'immagine	&amp;Загрузить изображение	&amp;Завантажити зображення	&amp;Charger une image	&amp;Cargar archivo de imagen	이미지 파일 부르기(&amp;O)	イメージファイルの読み込み(&amp;O)	读取图像文件(&amp;O)	&amp;Otevřít obrázek
+MenuBar	&amp;Load AYAB Firmware	&amp;Load AYAB Firmware	&amp;AYAB Firmware aufspielen	&amp;Uppfæra AYAB hugbúnað	&amp;Carica il firmware AYAB	&amp;Загрузить прошивку AYAB	&amp;Завантажити прошивку AYAB	&amp;Chargement du firmware AYAB	&amp;Cargar el firmware AYAB	AYAB 펌웨어 설정(&amp;L)	AYABのファームウェアをロードする(&amp;L)	读取AYAB固件(&amp;L)	&amp;Nahrát firmware AYAB
+MenuBar	&amp;Test AYAB Device	&amp;Test AYAB Device	AYAB-&amp;Gerät testen	&amp;Prófa AYAB tæki	&amp;Test dispositivo AYAB	&amp;Проверить устройство AYAB	&amp;Перевірити пристрій AYAB	&amp;Test de l'appareil AYAB	&amp;Probar dispositivo AYAB	AYAB 장치 테스트(&amp;T)	AYABデバイスをテストする(&amp;T)	测试AYAB设备(&amp;T)	&amp;Otestovat zařízení AYAB
+MenuBar	&amp;Knit	&amp;Knit	&amp;Stricken	P&amp;rjónið	&amp;Lavora	&amp;Вязание	&amp;В'язання	T&amp;ricoter	&amp;Tejer	니트!(&amp;K)	編む(&amp;K)	编织(&amp;K)	&amp;Plést
+MenuBar	&amp;Cancel Knitting	&amp;Cancel Knitting	S&amp;tricken abbrechen	&amp;Hætta við prjón	&amp;Annulla lavorazione	&amp;Отменить вязание	&amp;Скасувати в'язання	&amp;Annuler le tricot	&amp;Anular tejido	니팅 취소(&amp;C)	編みをキャンセル(&amp;C)	取消编织(&amp;C)	&amp;Zrušit pletení
+MenuBar	&amp;Quit	&amp;Quit	&amp;Beenden	H&amp;ætta	C&amp;hiudi	&amp;Выход	&amp;Вихід	&amp;Quitter	&amp;Salir	끝내기(&amp;Q)	やめる(&amp;Q)	退出(&amp;Q)	&amp;Ukončit
+MenuBar	Help – &amp;About	Help – &amp;About	&amp;Hilfe – Über	&amp;Hjálp – Um	&amp;Aiuto – Informazioni	&amp;Помощь - о программе	&amp;Допомога – Про	&amp;Aide – À propos	&amp;Ayuda – Sobre	도움 - 관하여(&amp;A)	ヘルプ - について(&amp;A)	帮助-关于(&amp;A)	&amp;Nápověda – O programu
+MenuBar	&amp;Invert	&amp;Invert	&amp;Invertieren	&amp;Hvolfa	&amp;Inverti	&amp;Инвертировать	&amp;Інвертувати	&amp;Inverser	&amp;Invertir	뒤집기(&amp;I)	反転する(&amp;I)	反色(&amp;I)	&amp;Invertovat
+MenuBar	&amp;Stretch	&amp;Stretch	&amp;Strecken	&amp;Teygja	&amp;Allunga	&amp;Растянуть	&amp;Розтягнути	&amp;Etirer	&amp;Tramo	늘리기(&amp;S)	ストレッチする(&amp;S)	拉伸(&amp;S)	&amp;Roztáhnout
+MenuBar	&amp;Repeat	&amp;Repeat	&amp;Wiederholen	&amp;Endurtaka	&amp;Ripeti	&amp;Повторить	&amp;Повторити	&amp;Répéter	&amp;Repetir	반복(&amp;R)	繰り返す(&amp;R)	重复(&amp;R)	&amp;Opakovat
+MenuBar	Re&amp;flect	Re&amp;flect	S&amp;piegeln	E&amp;ndurspegla	Ri&amp;fletti	&amp;Отразить	&amp;Відобразити	Re&amp;fléter	R&amp;eflejar	반영(&amp;F)	反映する(&amp;F)	镜像(&amp;F)	&amp;Zrcadlit
+MenuBar	&amp;Horizontal Flip	&amp;Horizontal Flip	&amp;Horizontal spiegeln	&amp;Snúa lárétt	Inverti &amp;orizzontale	Отражение по &amp;горизонтали	Відобразити по &amp;горизонталі	Retourner &amp;horizontal	&amp;Volteo horizontal	수평 뒤집기(&amp;H)	水平反転(&amp;H)	水平翻转(&amp;H)	&amp;Překlopit vodorovně
+MenuBar	&amp;Vertical Flip	&amp;Vertical Flip	&amp;Vertikal spiegeln	Snúa &amp;lóðrétt	Inverti &amp;verticale	Отражение по &amp;вертикали	Ві&amp;добразити по вертикалі	Retourner &amp;vertical	V&amp;olteo vertical	수직 뒤집기(&amp;V)	垂直反転(&amp;V)	垂直翻转(&amp;V)	Překlopit &amp;svisle
+MenuBar	Rotate &amp;Left	Rotate &amp;Left	&amp;Links drehen	Snúa til &amp;vinstri	Ruota a &amp;sinistra	Поворо&amp;т влево	&amp;Обертати ліворуч	Rotation &amp;à gauche	&amp;Girar a la izquierda	왼쪽으로 돌리기(&amp;L)	左に回転(&amp;L)	左转(&amp;L)	Otočit &amp;doleva
+MenuBar	Rotate Ri&amp;ght	Rotate Ri&amp;ght	&amp;Rechts drehen	Sn&amp;úa til hægri	Ruota a &amp;destra	Поворот впр&amp;аво	О&amp;бертати праворуч	Rotation à &amp;droite	Girar &amp;a la derecha	오른쪽으로 돌리기(&amp;G)	右に回転(&amp;G)	右转(&amp;G)	O&amp;točit doprava
+MenuBar	&amp;Set Preferences	&amp;Set Preferences	&amp;Einstellungen festlegen	&amp;Setjið forstillingar	&amp;Imposta preferenze	&amp;Установить персональные настройки	&amp;Встановити налаштування	&amp;Indiquez vos préférences	&amp;Cofigurar preferencias	기본 설정(&amp;S)	環境設定を設定する(&amp;S)	设置偏好(&amp;S)	&amp;Nastavit předvolby
+MenuBar	&amp;Zoom in	&amp;Zoom in	V&amp;ergrößern	St&amp;ækka	&amp;Zoom in	При&amp;близить	&amp;Збільшити	&amp;Zoomer	A&amp;lejar	확대(&amp;Z)	ズームイン(&amp;Z)	放大(&amp;Z)	P&amp;řiblížit
+MenuBar	Zoom &amp;out	Zoom &amp;out	Ver&amp;kleinern	&amp;Minnka	Zoom &amp;out	От&amp;далить	З&amp;меншити	D&amp;ézoomer	Ale&amp;jar	축소(&amp;O)	ズームアウト(&amp;O)	缩小(&amp;O)	Odd&amp;álit
+MenuBar	&amp;Recent Files	&amp;Recent Files				&amp;Последние файлы							
 Mirrors	Reflect image	Reflect image	Muster spiegeln	Endurspegla mynd	Rifletti l'immagine	Отразить изображение	Відобразити зображення	Refléter l'image	Reflejar imagen	이미지 반영	イメージを反映する	倒映图像	Zrcadlit obrázek
 Mirrors	Add mirrors	Add mirrors	Spiegelungen hinzufügen	Spegla	Specchia	Добавить зеркальное отражение	Додати дзеркальне відображення	Miroirs	Agregar espejos	반영 추가	ミラーを追加するる	添加镜像	Přidat zrcadlení
 Mirrors	Left	Left	Links	Vinstri	Sinistra	Слева	Ліворуч	Gauche	Izquierda	왼쪽	左	左	Vlevo
