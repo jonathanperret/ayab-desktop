@@ -57,6 +57,8 @@ class Engine(SignalSender, QDockWidget):
 
     pattern: Pattern
     status: StatusTab
+    ui: Ui_Dock
+    control: Control
 
     def __init__(self, parent: GuiMain):
         # set up UI

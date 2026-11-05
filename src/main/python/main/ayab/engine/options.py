@@ -78,6 +78,7 @@ class OptionsTab(SignalSender, QWidget):
     start_needle: int
     start_row: int
     stop_needle: int
+    ui: Ui_Options
 
     def __init__(self, parent: GuiMain):
         super().__init__(parent.signal_receiver)

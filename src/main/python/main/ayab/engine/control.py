@@ -63,6 +63,7 @@ class Control(SignalSender):
     line_block: int
     mode: Mode
     mode_func: ModeFuncType
+    notification: Output
     num_colors: int
     passes_per_row: int
     pat_height: int

@@ -15,6 +15,7 @@ if TYPE_CHECKING:  # TODO: why does mypy not resolve the absolute import correct
     from main.ayab.ayab import GuiMain
     from main.ayab import utils
     from main.ayab.version_checker import VersionChecker
+    from main.ayab import demo
 
     # from https://github.com/python/typing/discussions/1102#discussioncomment-2376328
     cached_property = property
@@ -23,15 +24,18 @@ else:
         from main.ayab.ayab import GuiMain
         from main.ayab import utils
         from main.ayab.version_checker import VersionChecker
+        from main.ayab import demo
     except ImportError:  # 'fbs run' needs weird things.
         from ayab.ayab import GuiMain
         from ayab import utils
         from ayab.version_checker import VersionChecker
+        from ayab import demo
     from fbs_runtime.application_context.PySide6 import cached_property
 
 
 class AppContext(ApplicationContext):  # type: ignore # 1. Subclass ApplicationContext
     _version_checker: VersionChecker
+    _demo: demo.DemoScript
 
     def run(self) -> int:  # 2. Implement run()
         self.make_user_directory()
@@ -42,6 +46,9 @@ class AppContext(ApplicationContext):  # type: ignore # 1. Subclass ApplicationC
             current_version=utils.package_version(self)
         )
         self._version_checker.start_background_check()
+        if demo.is_enabled():
+            self._demo = demo.DemoScript(self.main_window)
+            self._demo.start()
         return cast(int, self.app.exec())  # 3. End run() with this line
 
     def make_user_directory(self) -> None:
