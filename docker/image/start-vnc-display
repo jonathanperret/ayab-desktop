@@ -1,7 +1,7 @@
 #!/bin/sh
-# Start a virtual X display with a window manager and an authenticated VNC
-# server on port 5900, then return once the display is ready. Shared by the
-# Linux and Wine images.
+# Start a virtual X display with a window manager, an authenticated VNC server
+# on port 5900 and the noVNC browser client on port 6080, then return once the
+# display is ready. Shared by the Linux and Wine images.
 #
 # Environment: DISPLAY (default :99), VNC_PASSWORD (default ayab)
 set -eu
@@ -24,7 +24,7 @@ done
 
 openbox &
 
-# macOS VNC viewers send Option as Meta_L or Mode_switch (TigerVNC). Xvfb only
+# macOS VNC clients may send Option as Meta_L or Mode_switch. Xvfb only
 # has Meta_L as Shift+Alt, so x11vnc would wrap a fake Shift press around it,
 # which stops Windows from treating a lone Alt press as "activate the menu
 # bar"; Mode_switch has no key at all and would be dropped. Send plain Alt.
@@ -36,3 +36,9 @@ x11vnc \
     -passwd "$VNC_PASSWORD" \
     -rfbport 5900 \
     -listen 0.0.0.0 &
+
+# noVNC in a browser: websockify serves the client (see install-novnc) and
+# bridges its WebSocket to x11vnc, which still checks the VNC password. Its
+# per-request log goes to a file to keep the container log readable.
+websockify --web /usr/share/novnc 6080 localhost:5900 \
+    >/tmp/websockify.log 2>&1 &

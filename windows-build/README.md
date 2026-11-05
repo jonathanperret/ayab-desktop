@@ -36,9 +36,11 @@ application added, started by default:
       --tag ayab-windows-build \
       --build-arg APP_VERSION=1.1.0 .
     docker run --rm --platform linux/amd64 \
-      --publish 127.0.0.1:5901:5900 ayab-windows-build
+      --publish 127.0.0.1:6080:6080 --publish 127.0.0.1:5901:5900 \
+      ayab-windows-build
 
-Then connect a VNC viewer to `127.0.0.1:5901` (password `ayab`).
+Then open `http://127.0.0.1:6080/vnc.html?autoconnect=1&resize=scale`
+(password `ayab`), or connect a VNC viewer to `127.0.0.1:5901`.
 
 ## Native Windows build
 

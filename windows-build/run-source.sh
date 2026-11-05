@@ -1,7 +1,8 @@
 #!/bin/sh
 # Run this source checkout with Windows Python under Wine in Docker (fbs run)
-# and open a VNC viewer on it. The checkout is mounted, so source changes are
-# picked up on each launch. See docker/README.md for environment variables.
+# and open its display in the browser (noVNC). The checkout is mounted, so
+# source changes are picked up on each launch. See docker/README.md for
+# environment variables.
 #
 # Usage: windows-build/run-source.sh [fbs run arguments...]
 set -eu

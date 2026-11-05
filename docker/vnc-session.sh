@@ -1,20 +1,18 @@
 # Sourced (not executed) by the run-*.sh scripts in linux-build/ and
 # windows-build/: run AYAB in a container of the image built from
 # docker/Dockerfile, whose display is served over VNC (see
-# docker/image/start-vnc-display), and open a VNC viewer on it (TigerVNC if
-# installed, otherwise macOS Screen Sharing).
+# docker/image/start-vnc-display), and open that display in the browser with
+# noVNC.
 #
-# Environment: VNC_PORT (default 5901), VNC_PASSWORD (default ayab),
-#              CONTAINER_NAME (default ayab), DARK_MODE (default 0; 1 for
-#              dark mode)
+# Environment: NOVNC_PORT (default 6080), VNC_PORT (default 5901, for native
+#              VNC clients), VNC_PASSWORD (default ayab), CONTAINER_NAME
+#              (default ayab), DARK_MODE (default 0; 1 for dark mode)
 
+: "${NOVNC_PORT:=6080}"
 : "${VNC_PORT:=5901}"
 : "${VNC_PASSWORD:=ayab}"
 : "${CONTAINER_NAME:=ayab}"
 repo=$(cd "$(dirname "$0")/.." && pwd)
-
-passwd_file=
-trap '[ -z "$passwd_file" ] || rm -f "$passwd_file"' EXIT
 
 image=ayab
 
@@ -42,13 +40,17 @@ run_in_vnc() {
     echo "Starting $description in container $CONTAINER_NAME..."
     docker run --detach --rm --platform linux/amd64 \
         --name "$CONTAINER_NAME" \
+        --publish "127.0.0.1:$NOVNC_PORT:6080" \
         --publish "127.0.0.1:$VNC_PORT:5900" \
         --env VNC_PASSWORD="$VNC_PASSWORD" \
         --env DARK_MODE="${DARK_MODE:-0}" \
         "$@" >/dev/null
 
-    # x11vnc prints its port once it accepts connections
-    until docker logs "$CONTAINER_NAME" 2>&1 | grep -q '^PORT='; do
+    # x11vnc prints its port once it accepts connections; websockify starts
+    # right after it
+    novnc_url="http://127.0.0.1:$NOVNC_PORT/vnc.html"
+    until docker logs "$CONTAINER_NAME" 2>&1 | grep -q '^PORT=' \
+            && curl --silent --fail --output /dev/null "$novnc_url"; do
         if ! container_running; then
             echo "Container exited before VNC was ready" >&2
             exit 1
@@ -78,21 +80,14 @@ run_in_vnc() {
 }
 
 open_viewer() {
-    # TigerVNC reads the password from a standard VNC password file
-    passwd_file=$(mktemp -t ayab-vncpasswd)
-    docker exec "$CONTAINER_NAME" sh -c \
-        'x11vnc -storepasswd "$VNC_PASSWORD" /tmp/vncpasswd >/dev/null 2>&1 && cat /tmp/vncpasswd' \
-        > "$passwd_file"
-
-    tigervnc_app=$(ls -d /Applications/TigerVNC*.app "$HOME"/Applications/TigerVNC*.app 2>/dev/null | tail -n 1 || true)
-    if command -v vncviewer >/dev/null 2>&1; then
-        echo "Opening vncviewer"
-        vncviewer -passwd "$passwd_file" "127.0.0.1::$VNC_PORT" >/dev/null 2>&1 &
-    elif [ -n "$tigervnc_app" ]; then
-        echo "Opening $(basename "$tigervnc_app")"
-        open -n -a "$tigervnc_app" --args -passwd "$passwd_file" "127.0.0.1::$VNC_PORT"
-    else
-        echo "Opening Screen Sharing"
-        open "vnc://:$VNC_PASSWORD@127.0.0.1:$VNC_PORT"
+    # The password in the URL lets noVNC connect without prompting. The ports
+    # are bound to localhost only, but the URL lands in the browser history.
+    url="$novnc_url?autoconnect=1&resize=scale&password=$VNC_PASSWORD"
+    echo "Opening noVNC: $url"
+    echo "(Native VNC clients: vnc://127.0.0.1:$VNC_PORT, password $VNC_PASSWORD)"
+    if [ "$(uname)" = Darwin ]; then
+        open "$url"
+    elif command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$url" >/dev/null 2>&1 &
     fi
 }

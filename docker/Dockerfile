@@ -24,12 +24,13 @@ ENV DEBIAN_FRONTEND=noninteractive \
     APPIMAGE_EXTRACT_AND_RUN=1
 
 # Virtual display, window manager and VNC server (see start-vnc-display);
-# maim and xdotool take screenshots and send input with docker exec; 7zip
-# unpacks Windows release installers; the rest is what Qt needs on Linux
+# websockify serves noVNC; maim and xdotool take screenshots and send input
+# with docker exec; 7zip unpacks Windows release installers; the rest is what
+# Qt needs on Linux
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates curl unzip 7zip \
-        xvfb xauth x11-utils x11vnc openbox maim xdotool \
+        xvfb xauth x11-utils x11vnc openbox websockify maim xdotool \
         libasound2t64 libasound2-plugins \
         libdbus-1-3 libegl1 libfontconfig1 libgl1 libglib2.0-0t64 \
         libgtk-3-0t64 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 \
@@ -42,11 +43,15 @@ RUN printf '%s\n' \
         'ctl.!default { type pulse }' \
         > /etc/asound.conf
 
+# noVNC browser client, served by websockify (see start-vnc-display)
+COPY --chmod=0755 docker/image/install-novnc /tmp/install-novnc
+RUN /tmp/install-novnc && rm /tmp/install-novnc
+
 COPY --chmod=0755 docker/image/start-vnc-display /usr/local/bin/start-vnc-display
 # Qt (and Wine's winebrowser) open URLs with xdg-open; show them in a dialog
 COPY --chmod=0755 docker/image/xdg-open /usr/local/bin/xdg-open
 
-EXPOSE 5900
+EXPOSE 5900 6080
 
 FROM base AS wine
 

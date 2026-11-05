@@ -1,0 +1,21 @@
+#!/bin/sh
+# Install the noVNC web client (static files only) into /usr/share/novnc, for
+# websockify to serve (see start-vnc-display). Shared by the Linux and Wine
+# images. Distribution packages are either old (EPEL) or pull in Node.js
+# (Debian), so a pinned upstream release is used instead.
+set -eu
+
+version=1.6.0
+sha256=5066103959ef4e9b10f37e5a148627360dd8414e4cf8a7db92bdbd022e728aaa
+
+curl --fail --silent --show-error --location --output /tmp/novnc.tar.gz \
+    "https://github.com/novnc/noVNC/archive/refs/tags/v$version.tar.gz"
+echo "$sha256  /tmp/novnc.tar.gz" | sha256sum --check --quiet -
+mkdir -p /usr/share/novnc
+tar -xzf /tmp/novnc.tar.gz --strip-components=1 -C /usr/share/novnc \
+    "noVNC-$version/app" "noVNC-$version/core" "noVNC-$version/vendor" \
+    "noVNC-$version/vnc.html" "noVNC-$version/defaults.json" \
+    "noVNC-$version/mandatory.json" "noVNC-$version/LICENSE.txt"
+rm /tmp/novnc.tar.gz
+# Serve the full client at / too
+ln -s vnc.html /usr/share/novnc/index.html

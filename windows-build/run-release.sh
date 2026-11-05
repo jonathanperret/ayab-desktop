@@ -1,6 +1,7 @@
 #!/bin/sh
 # Run a downloaded AYAB Windows release installer under Wine in Docker and
-# open a VNC viewer on it. See docker/README.md for environment variables.
+# open its display in the browser (noVNC). See docker/README.md for
+# environment variables.
 #
 # Usage: windows-build/run-release.sh path/to/AYAB-x.y.z.exe [AYAB arguments...]
 set -eu

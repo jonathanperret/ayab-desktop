@@ -1,7 +1,7 @@
 #!/bin/sh
-# Run this source checkout with Linux Python in Docker (fbs run) and open a VNC
-# viewer on it. The checkout is mounted, so source changes are picked up on
-# each launch. See docker/README.md for environment variables.
+# Run this source checkout with Linux Python in Docker (fbs run) and open its
+# display in the browser (noVNC). The checkout is mounted, so source changes
+# are picked up on each launch. See docker/README.md for environment variables.
 #
 # Usage: linux-build/run-source.sh [fbs run arguments...]
 set -eu

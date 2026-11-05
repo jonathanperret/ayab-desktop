@@ -1,5 +1,6 @@
 #!/bin/sh
-# Run an AYAB Linux AppImage in Docker and open a VNC viewer on it.
+# Run an AYAB Linux AppImage in Docker and open its display in the
+# browser (noVNC).
 # See docker/README.md for environment variables.
 #
 # Usage: linux-build/run-appimage.sh path/to/AYAB-x.y.z-x86_64.AppImage [AYAB arguments...]
