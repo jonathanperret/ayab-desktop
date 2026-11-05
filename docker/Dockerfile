@@ -1,41 +1,75 @@
-# Wine provides the Windows runtime while Docker makes the build reproducible
-# on Linux and macOS. This base supports both frozen and source-based runs.
-
 # syntax=docker/dockerfile:1
 # check=skip=FromPlatformFlagConstDisallowed
 
-# wine-base is the base Wine image
-FROM --platform=linux/amd64 debian:trixie-slim AS wine-base
+# One image runs AYAB both natively on Linux and as the Windows build under
+# Wine, on a virtual display served over VNC; see docker/README.md. Debian
+# trixie provides Wine 10, and the python:3.11 base the Python version AYAB
+# requires for Linux runs. Build with the repository root as the context:
+#
+#     docker build --file docker/Dockerfile --target runner --tag ayab .
+#
+# The builder and artifact targets cross-build the Windows application; see
+# windows-build/README.md.
 
+FROM --platform=linux/amd64 python:3.11-slim-trixie AS base
+
+# Audio expects a PulseAudio server on the host; on macOS:
+#     brew install pulseaudio
+#     pulseaudio --exit-idle-time=-1 --load="module-native-protocol-tcp listen=127.0.0.1 port=4713 auth-anonymous=1"
 ENV DEBIAN_FRONTEND=noninteractive \
     DISPLAY=:99 \
     PULSE_SERVER=tcp:host.docker.internal:4713 \
-    WINEARCH=win64 \
+    PYTHONUTF8=1 \
+    PYTHONUNBUFFERED=1 \
+    APPIMAGE_EXTRACT_AND_RUN=1
+
+# Virtual display, window manager and VNC server (see start-vnc-display);
+# maim and xdotool take screenshots and send input with docker exec; 7zip
+# unpacks Windows release installers; the rest is what Qt needs on Linux
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl unzip 7zip \
+        xvfb xauth x11-utils x11vnc openbox maim xdotool \
+        libasound2t64 libasound2-plugins \
+        libdbus-1-3 libegl1 libfontconfig1 libgl1 libglib2.0-0t64 \
+        libgtk-3-0t64 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 \
+        libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
+        libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN printf '%s\n' \
+        'pcm.!default { type pulse }' \
+        'ctl.!default { type pulse }' \
+        > /etc/asound.conf
+
+COPY --chmod=0755 docker/image/start-vnc-display /usr/local/bin/start-vnc-display
+# Qt (and Wine's winebrowser) open URLs with xdg-open; show them in a dialog
+COPY --chmod=0755 docker/image/xdg-open /usr/local/bin/xdg-open
+
+EXPOSE 5900
+
+FROM base AS wine
+
+ENV WINEARCH=win64 \
     WINEPREFIX=/wine \
     WINEDEBUG=-all \
-    WINEDLLOVERRIDES=mscoree,mshtml= \
-    PYTHONUTF8=1 \
-    PYTHONUNBUFFERED=1
+    WINEDLLOVERRIDES=mscoree,mshtml=
 
-# maim and xdotool take screenshots and send input with docker exec
 RUN dpkg --add-architecture i386 \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates curl openbox unzip wine wine32:i386 wine64 fonts-wine \
-        x11-utils x11vnc xauth xvfb \
-        maim xdotool \
+        wine wine32:i386 wine64 fonts-wine \
     && rm -rf /var/lib/apt/lists/*
 
 RUN xvfb-run -a sh -c \
         'wineboot --init \
         && wineserver -w'
 
-EXPOSE 5900
-
-FROM wine-base AS wine-python
+FROM wine AS wine-python
 
 ARG PYTHON_VERSION=3.11.9
 
+# Build steps run Wine without a display
 ENV DISPLAY=
 
 RUN curl --fail --location --output /tmp/python.nupkg \
@@ -76,17 +110,33 @@ RUN sed -i \
         "s/for ucrt_dll in ('api-ms-win-crt-multibyte-l1-1-0.dll',):/for ucrt_dll in ():/" \
         /wine/drive_c/Python311/Lib/site-packages/fbs/freeze/windows.py
 
-FROM wine-python AS source-runner
+# Linux Python environment, built separately so that the compiler needed by
+# simpleaudio stays out of the final image
+FROM --platform=linux/amd64 python:3.11-slim-trixie AS linux-python
 
-# Cleared in wine-python so that build steps run Wine without a display
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc libc6-dev libasound2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.build.txt /tmp/requirements/
+
+# Same fbs source archive as for Windows, so git isn't needed
+RUN --mount=type=cache,target=/root/.cache/pip \
+    sed -E \
+        's#^fbs @ git\+https://github.com/([^@]+)@([0-9a-f]+)$#fbs @ https://github.com/\1/archive/\2.zip#' \
+        /tmp/requirements/requirements.build.txt > /tmp/requirements/linux.txt \
+    && python -m venv /opt/venv \
+    && /opt/venv/bin/pip install -r /tmp/requirements/linux.txt
+
+FROM wine-python AS runner
+
 ENV DISPLAY=:99
 
-COPY --chmod=0755 docker/image/start-vnc-display /usr/local/bin/start-vnc-display
-COPY --chmod=0755 windows-build/image/run-wine.sh /usr/local/bin/run-wine
-# Wine's winebrowser opens URLs with xdg-open; show them in a dialog instead
-COPY --chmod=0755 docker/image/xdg-open /usr/local/bin/xdg-open
+COPY --from=linux-python /opt/venv /opt/venv
+COPY --chmod=0755 docker/image/ayab-entrypoint /usr/local/bin/ayab-entrypoint
 
-CMD ["run-wine", "C:\\Python311\\python.exe", "-m", "fbs", "run"]
+ENTRYPOINT ["ayab-entrypoint"]
+CMD ["source-linux"]
 
 FROM wine-python AS builder
 
@@ -117,25 +167,11 @@ RUN case "$APP_VERSION" in \
     && xvfb-run -a wine C:\\Python311\\python.exe -m fbs freeze \
     && test -f target/AYAB/AYAB.exe
 
-FROM wine-base AS wine-runner
-
-# Used by run-wine to unpack release installers
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends 7zip \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --chmod=0755 docker/image/start-vnc-display /usr/local/bin/start-vnc-display
-COPY --chmod=0755 windows-build/image/run-wine.sh /usr/local/bin/run-wine
-# Wine's winebrowser opens URLs with xdg-open; show them in a dialog instead
-COPY --chmod=0755 docker/image/xdg-open /usr/local/bin/xdg-open
-
-ENTRYPOINT ["run-wine"]
-
-FROM wine-runner AS wine-ayab-runner
+# The runner with the cross-built Windows application
+FROM runner AS wine-ayab-runner
 
 COPY --from=builder /workspace/target/AYAB /AYAB
-WORKDIR /AYAB
-CMD ["AYAB.exe"]
+CMD ["/AYAB/AYAB.exe"]
 
 FROM scratch AS artifact
 COPY --from=builder /workspace/target/AYAB /AYAB

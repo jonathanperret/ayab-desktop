@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run a downloaded AYAB Windows release installer under Wine in Docker and
-# open a VNC viewer on it. See docker/vnc-session.sh for environment variables.
+# open a VNC viewer on it. See docker/README.md for environment variables.
 #
 # Usage: windows-build/run-release.sh path/to/AYAB-x.y.z.exe [AYAB arguments...]
 set -eu
@@ -15,7 +15,7 @@ shift
 
 . "$(dirname "$0")/../docker/vnc-session.sh"
 
-build_image windows-build/Dockerfile wine-runner ayab-wine-runner
+build_image
 run_in_vnc "$(basename "$installer")" \
     --mount "type=bind,source=$installer,target=/installer.exe,readonly" \
-    ayab-wine-runner /installer.exe "$@"
+    "$image" /installer.exe "$@"

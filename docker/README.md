@@ -3,8 +3,9 @@
 These scripts run AYAB in a Linux container, either natively on Linux or as the
 Windows build under Wine, and open a VNC viewer on it: TigerVNC if installed
 (`brew install --cask tigervnc-viewer`), otherwise macOS Screen Sharing. Run
-them from anywhere; they build the image they need first (cached after the
-first time).
+them from anywhere. They all use the same image, built from
+`docker/Dockerfile` on each launch (cached after the first time). Source runs
+mount the checkout, so changes are picked up on the next launch.
 
 | Command                                                  | Runs                                          |
 | -------------------------------------------------------- | --------------------------------------------- |
@@ -24,26 +25,41 @@ Environment variables:
   container with the same name.
 
 Audio goes to a PulseAudio server on the host, if one is running (see
-`linux-build/Dockerfile`). Links opened by the app are shown in a dialog instead of a
-browser (`docker/image/xdg-open`).
+`docker/Dockerfile`). Links opened by the app are shown in a dialog instead of
+a browser (`docker/image/xdg-open`).
 
 ## Scripting the display
 
-The images include `xdotool` and `maim`, so the running app can be driven and
+The image includes `xdotool` and `maim`, so the running app can be driven and
 captured from the host, e.g. to open the File menu and take a screenshot:
 
     docker exec ayab xdotool key alt+f
     docker exec ayab maim > screenshot.png
 
-## Layout
+## The image
 
-- `docker/`: shared by the Linux and Wine setups. `image/` holds files
-  installed in both images (`start-vnc-display` runs Xvfb, Openbox and
-  x11vnc; `xdg-open`); `vnc-session.sh` is used by the host scripts to start
-  the container, wait for the AYAB window and open the viewer.
-- `linux-build/`: `Dockerfile` (`appimage-host` and `build` targets), the
-  image's entrypoint in `image/`, and the `run-*.sh` host scripts.
-- `windows-build/`: the same for Wine, see `windows-build/README.md`.
+`docker/Dockerfile` (Debian trixie with Python 3.11) has Wine 10 with Windows
+Python, and Linux Python, each with AYAB's dependencies. Its entrypoint,
+`docker/image/ayab-entrypoint`, starts the VNC display (`start-vnc-display`:
+Xvfb, Openbox and x11vnc on port 5900) and then runs, depending on its first
+argument:
 
-The images are built with the repository root as the context, e.g.
-`docker build --file linux-build/Dockerfile --target build .`
+| Argument            | Runs                                                       |
+| ------------------- | ---------------------------------------------------------- |
+| `source-linux`      | the checkout mounted at `/workspace`, with Linux Python    |
+| `source-wine`       | the checkout mounted at `/workspace`, with Windows Python  |
+| `path/to/*.AppImage` | a Linux AppImage                                          |
+| `path/to/*.exe`     | a Windows program under Wine; a release installer is unpacked first |
+
+To use it without the scripts, from the repository root:
+
+    docker build --platform linux/amd64 --file docker/Dockerfile --target runner --tag ayab .
+    docker run --rm --platform linux/amd64 --publish 127.0.0.1:5901:5900 \
+      --mount type=bind,source="$PWD",target=/workspace ayab source-wine
+
+and connect a VNC viewer to `127.0.0.1:5901` (password `ayab`).
+
+`docker/vnc-session.sh` holds what the host scripts share: building the image,
+starting the container, waiting for the AYAB window and opening the viewer.
+The same Dockerfile also cross-builds the Windows application, see
+`windows-build/README.md`.

@@ -1,6 +1,7 @@
-# Sourced (not executed) by the run-*.sh scripts in docker/ and windows-build/:
-# run AYAB in a Docker container whose display is served over VNC (see
-# docker/image/start-vnc-display) and open a VNC viewer on it (TigerVNC if
+# Sourced (not executed) by the run-*.sh scripts in linux-build/ and
+# windows-build/: run AYAB in a container of the image built from
+# docker/Dockerfile, whose display is served over VNC (see
+# docker/image/start-vnc-display), and open a VNC viewer on it (TigerVNC if
 # installed, otherwise macOS Screen Sharing).
 #
 # Environment: VNC_PORT (default 5901), VNC_PASSWORD (default ayab),
@@ -15,13 +16,15 @@ repo=$(cd "$(dirname "$0")/.." && pwd)
 passwd_file=
 trap '[ -z "$passwd_file" ] || rm -f "$passwd_file"' EXIT
 
-# build_image DOCKERFILE TARGET TAG (DOCKERFILE relative to the repository)
+image=ayab
+
+# Build the image (quick when nothing changed)
 build_image() {
-    echo "Building $3 image..."
+    echo "Building $image image..."
     docker build --quiet --platform linux/amd64 \
-        --file "$repo/$1" \
-        --target "$2" \
-        --tag "$3" \
+        --file "$repo/docker/Dockerfile" \
+        --target runner \
+        --tag "$image" \
         "$repo" >/dev/null
 }
 
