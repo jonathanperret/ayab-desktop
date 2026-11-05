@@ -9,7 +9,8 @@ set -eu
 
 . "$(dirname "$0")/../docker/vnc-session.sh"
 
-build_image
+build_image wine-source
 run_in_vnc "source checkout (Wine)" \
     --mount "type=bind,source=$repo,target=/workspace" \
-    "$image" source-wine "$@"
+    --mount "type=volume,source=$venvs_volume,target=/venvs" \
+    "$image" source-wine run "$@"

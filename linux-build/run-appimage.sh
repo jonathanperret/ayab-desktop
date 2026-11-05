@@ -16,7 +16,7 @@ shift
 
 . "$(dirname "$0")/../docker/vnc-session.sh"
 
-build_image
+build_image linux-release
 run_in_vnc "$(basename "$appimage")" \
     --mount "type=bind,source=$appimage,target=/app/$(basename "$appimage"),readonly" \
     "$image" "/app/$(basename "$appimage")" "$@"

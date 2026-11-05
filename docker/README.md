@@ -3,9 +3,16 @@
 These scripts run AYAB in a Linux container, either natively on Linux or as the
 Windows build under Wine, and open the app's display in your web browser with
 [noVNC](https://novnc.com), so no VNC client needs to be installed. Run them
-from anywhere. They all use the same image, built from
-`docker/Dockerfile` on each launch (cached after the first time). Source runs
-mount the checkout, so changes are picked up on the next launch.
+from anywhere. Each builds the image it needs from `docker/Dockerfile` on
+launch (cached after the first time).
+
+Source runs mount the checkout, so changes are picked up on the next launch.
+Their Python environment lives in a Docker volume (`ayab-venvs`): the first
+run creates it, which takes a while, and later runs update it when the
+requirements change. Qt modules generated from `.ui` and `.qrc` files are
+regenerated in the checkout when missing or out of date. Arguments are passed
+to `fbs run`. The `wine-source` image can also cross-build the Windows
+application; see `windows-build/README.md`.
 
 | Command                                                  | Runs                                          |
 | -------------------------------------------------------- | --------------------------------------------- |
@@ -27,6 +34,8 @@ Environment variables:
   macOS Screen Sharing (`open vnc://127.0.0.1:5901`) or TigerVNC.
 - `VNC_PASSWORD` (default `ayab`), `CONTAINER_NAME` (default `ayab`).
   Starting a script replaces any running container with the same name.
+- `VENVS_VOLUME` (default `ayab-venvs`): the volume holding the source runs'
+  Python environments. `docker volume rm ayab-venvs` starts over.
 
 Both ports are bound to localhost only.
 
@@ -36,40 +45,44 @@ a browser (`docker/image/xdg-open`).
 
 ## Scripting the display
 
-The image includes `xdotool` and `maim`, so the running app can be driven and
+The images include `xdotool` and `maim`, so the running app can be driven and
 captured from the host, e.g. to open the File menu and take a screenshot:
 
     docker exec ayab xdotool key alt+f
     docker exec ayab maim > screenshot.png
 
-## The image
+## The images
 
-`docker/Dockerfile` (Debian trixie with Python 3.11) has Wine 10 with Windows
-Python, and Linux Python, each with AYAB's dependencies. Its entrypoint,
-`docker/image/ayab-entrypoint`, starts the VNC display (`start-vnc-display`:
-Xvfb, Openbox, x11vnc on port 5900, and websockify serving noVNC on port 6080;
-noVNC is a pinned release installed by `docker/image/install-novnc`) and then
-runs, depending on its first
-argument:
+`docker/Dockerfile` (Debian trixie with Python 3.11) builds four images, none
+of which contains AYAB code or dependencies:
 
-| Argument            | Runs                                                       |
-| ------------------- | ---------------------------------------------------------- |
-| `source-linux`      | the checkout mounted at `/workspace`, with Linux Python    |
-| `source-wine`       | the checkout mounted at `/workspace`, with Windows Python  |
-| `path/to/*.AppImage` | a Linux AppImage                                          |
-| `path/to/*.exe`     | a Windows program under Wine; a release installer is unpacked first |
+| Target          | Adds to the shared base                    | Runs                                |
+| --------------- | ------------------------------------------ | ----------------------------------- |
+| `linux-release` | nothing                                    | `path/to/*.AppImage`                |
+| `linux-source`  | a compiler, to build the environment       | `source-linux [fbs command]`        |
+| `wine-release`  | Wine 10                                    | `path/to/*.exe`; a release installer is unpacked first |
+| `wine-source`   | Wine 10 and a plain Windows Python 3.11    | `source-wine [fbs command]`         |
 
-To use it without the scripts, from the repository root:
+Source images run the checkout mounted at `/workspace` and keep their Python
+environment in `/venvs`. The shared entrypoint, `docker/image/ayab-entrypoint`,
+starts the display (`start-vnc-display`: Xvfb, Openbox, x11vnc on port 5900,
+and websockify serving noVNC on port 6080; noVNC is a pinned release
+installed by `docker/image/install-novnc`), then runs its argument.
 
-    docker build --platform linux/amd64 --file docker/Dockerfile --target runner --tag ayab .
+To use one without the scripts, from the repository root:
+
+    docker build --platform linux/amd64 --file docker/Dockerfile --target wine-source --tag ayab-wine-source .
     docker run --rm --platform linux/amd64 \
       --publish 127.0.0.1:6080:6080 --publish 127.0.0.1:5901:5900 \
-      --mount type=bind,source="$PWD",target=/workspace ayab source-wine
+      --mount type=bind,source="$PWD",target=/workspace \
+      --mount type=volume,source=ayab-venvs,target=/venvs ayab-wine-source
 
 and open `http://127.0.0.1:6080/vnc.html?autoconnect=1&resize=scale` (password
 `ayab`), or connect a VNC viewer to `127.0.0.1:5901`.
 
+CI (`.github/workflows/docker-image.yml`) checks that AYAB starts in each
+image and pushes them as `ghcr.io/<owner>/ayab-<target>`.
+
 `docker/vnc-session.sh` holds what the host scripts share: building the image,
-starting the container, waiting for the AYAB window and opening noVNC in the browser.
-The same Dockerfile also cross-builds the Windows application, see
-`windows-build/README.md`.
+starting the container, waiting for the AYAB window and opening noVNC in the
+browser.

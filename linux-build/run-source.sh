@@ -8,7 +8,8 @@ set -eu
 
 . "$(dirname "$0")/../docker/vnc-session.sh"
 
-build_image
+build_image linux-source
 run_in_vnc "source checkout (Linux)" \
     --mount "type=bind,source=$repo,target=/workspace" \
-    "$image" source-linux "$@"
+    --mount "type=volume,source=$venvs_volume,target=/venvs" \
+    "$image" source-linux run "$@"

@@ -16,7 +16,7 @@ shift
 
 . "$(dirname "$0")/../docker/vnc-session.sh"
 
-build_image
+build_image wine-release
 run_in_vnc "$(basename "$installer")" \
     --mount "type=bind,source=$installer,target=/installer.exe,readonly" \
     "$image" /installer.exe "$@"

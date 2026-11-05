@@ -1,9 +1,12 @@
-# Builds the Docker image from docker/Dockerfile (see docker/README.md),
-# checks that AYAB starts in it from source on Linux and under Wine, and
-# pushes it to the GitHub Container Registry as
-# ghcr.io/<owner>/ayab-desktop. Pull requests only build and check.
+# Builds the four images from docker/Dockerfile (see docker/README.md), checks
+# that AYAB starts in each, and pushes them to the GitHub Container Registry
+# as ghcr.io/<owner>/ayab-<target>. Pull requests only build and check.
+#
+# The release images are checked with the latest AYAB release, the source
+# images with this checkout (their first start sets up the Python
+# environment).
 
-name: Docker image
+name: Docker images
 
 on:
   push:
@@ -26,15 +29,31 @@ permissions:
   contents: read
   packages: write
 
+concurrency:
+  group: docker-images-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   image:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-release
+            run: /release/AYAB.AppImage
+          - target: linux-source
+            run: source-linux
+          - target: wine-release
+            run: /release/AYAB.exe
+          - target: wine-source
+            run: source-wine
     steps:
       - uses: actions/checkout@v4
 
       - name: Set image name
         # Registry image names must be lowercase
-        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/ayab-desktop" >> "$GITHUB_ENV"
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/ayab-${{ matrix.target }}" >> "$GITHUB_ENV"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -43,47 +62,57 @@ jobs:
         with:
           context: .
           file: docker/Dockerfile
-          target: runner
+          target: ${{ matrix.target }}
           platforms: linux/amd64
           load: true
           tags: ayab:test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.target }}
+          cache-to: type=gha,scope=${{ matrix.target }},mode=max
+
+      - name: Download the latest AYAB release
+        if: endsWith(matrix.target, '-release')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir release
+          gh release download --repo AllYarnsAreBeautiful/ayab-desktop \
+            --pattern '*.AppImage' --pattern '*.exe' --dir release
+          mv release/*.AppImage release/AYAB.AppImage
+          mv release/*.exe release/AYAB.exe
+          chmod +x release/AYAB.AppImage
 
       - name: Check that AYAB starts
         run: |
-          check() {
-            mode=$1
-            docker run --detach --name "ayab-$mode" \
-              --mount "type=bind,source=$PWD,target=/workspace" \
-              ayab:test "source-$mode"
-            for i in $(seq 120); do
-              if docker exec "ayab-$mode" sh -c \
-                  'xwininfo -root -tree | grep -q "\"AYAB"' 2>/dev/null; then
-                sleep 5  # let the window finish drawing
-                docker exec "ayab-$mode" sh -c 'xwininfo -root -tree | grep "\"AYAB"'
-                docker exec "ayab-$mode" maim > "screenshot-$mode.png"
-                docker rm --force "ayab-$mode" >/dev/null
-                return 0
-              fi
-              if [ -z "$(docker ps --quiet --filter "name=^ayab-$mode\$")" ]; then
-                break
-              fi
-              sleep 2
-            done
-            echo "::error::AYAB did not start ($mode)"
-            docker logs "ayab-$mode"
-            return 1
-          }
-          check linux
-          check wine
+          mkdir -p release  # only filled for release images
+          docker run --detach --name ayab \
+            --mount "type=bind,source=$PWD,target=/workspace" \
+            --mount "type=bind,source=$PWD/release,target=/release" \
+            ayab:test ${{ matrix.run }}
+          # Up to 20 minutes: source images first set up their environment
+          for i in $(seq 600); do
+            if docker exec ayab sh -c \
+                'xwininfo -root -tree | grep -q "\"AYAB"' 2>/dev/null; then
+              sleep 5  # let the window finish drawing
+              docker exec ayab sh -c 'xwininfo -root -tree | grep "\"AYAB"'
+              docker exec ayab maim > screenshot.png
+              docker logs ayab
+              exit 0
+            fi
+            if [ -z "$(docker ps --quiet --filter name=^ayab\$)" ]; then
+              break
+            fi
+            sleep 2
+          done
+          echo "::error::AYAB did not start"
+          docker logs ayab
+          exit 1
 
-      - name: Upload screenshots
+      - name: Upload screenshot
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: screenshots
-          path: screenshot-*.png
+          name: screenshot-${{ matrix.target }}
+          path: screenshot.png
           if-no-files-found: ignore
 
       - name: Log in to GitHub Container Registry
@@ -112,9 +141,9 @@ jobs:
         with:
           context: .
           file: docker/Dockerfile
-          target: runner
+          target: ${{ matrix.target }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
+          cache-from: type=gha,scope=${{ matrix.target }}

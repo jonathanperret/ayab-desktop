@@ -6,41 +6,32 @@ see `docker/README.md`.
 
 ## Cross-build with Docker
 
-`docker/Dockerfile` can also build the Windows application: it runs 64-bit
-Windows Python and PyInstaller under Wine. It produces the unpacked application
-bundle only; NSIS is not installed or run.
+The `wine-source` image (see `docker/README.md`) can also build the Windows
+application from this checkout: `fbs freeze` runs 64-bit Windows Python and
+PyInstaller under Wine. It produces the unpacked application bundle only; NSIS
+is not installed or run.
 
-From the repository root:
+fbs uses the version as a Windows file version, so it must contain exactly
+three numeric components. Like CI (`.github/actions/init-environment`), set it
+in the checkout first, then, from the repository root:
 
-    docker build --platform linux/amd64 \
-      --file docker/Dockerfile \
-      --target artifact \
-      --build-arg APP_VERSION=1.1.0 \
-      --output type=local,dest=target/windows .
-
-The executable is written to `target/windows/AYAB/AYAB.exe`. Distribute the
-whole `AYAB` directory because the executable depends on its `_internal`
-directory. On Apple Silicon, `--platform linux/amd64` runs the image through
-Docker Desktop's amd64 emulation.
-
-`APP_VERSION` must contain exactly three numeric components because fbs uses it
-as a Windows file version. The image defaults to Python 3.11.9, matching the
-native Windows CI; override it with `--build-arg PYTHON_VERSION=x.y.z`.
-
-The `wine-ayab-runner` target is the runner image with the cross-built
-application added, started by default:
-
-    docker build --platform linux/amd64 \
-      --file docker/Dockerfile \
-      --target wine-ayab-runner \
-      --tag ayab-windows-build \
-      --build-arg APP_VERSION=1.1.0 .
+    sed -i.bak -e 's/PACKAGE_VERSION/1.1.0/' src/build/settings/base.json
+    echo 1.1.0 > src/main/resources/base/ayab/package_version
+    docker build --platform linux/amd64 --file docker/Dockerfile \
+      --target wine-source --tag ayab-wine-source .
     docker run --rm --platform linux/amd64 \
-      --publish 127.0.0.1:6080:6080 --publish 127.0.0.1:5901:5900 \
-      ayab-windows-build
+      --mount type=bind,source="$PWD",target=/workspace \
+      --mount type=volume,source=ayab-venvs,target=/venvs \
+      ayab-wine-source source-wine freeze
 
-Then open `http://127.0.0.1:6080/vnc.html?autoconnect=1&resize=scale`
-(password `ayab`), or connect a VNC viewer to `127.0.0.1:5901`.
+The executable is written to `target/AYAB/AYAB.exe`. Distribute the whole
+`AYAB` directory because the executable depends on its `_internal` directory.
+`windows-build/run-release.sh target/AYAB/AYAB.exe` runs it. On Apple Silicon,
+`--platform linux/amd64` runs the image through Docker Desktop's amd64
+emulation.
+
+The image uses Windows Python 3.11.9, matching the native Windows CI; override
+it with `--build-arg PYTHON_VERSION=x.y.z`.
 
 ## Native Windows build
 

@@ -6,7 +6,8 @@
 #
 # Environment: NOVNC_PORT (default 6080), VNC_PORT (default 5901, for native
 #              VNC clients), VNC_PASSWORD (default ayab), CONTAINER_NAME
-#              (default ayab), DARK_MODE (default 0; 1 for dark mode)
+#              (default ayab), DARK_MODE (default 0; 1 for dark mode),
+#              VENVS_VOLUME (default ayab-venvs, for source runs)
 
 : "${NOVNC_PORT:=6080}"
 : "${VNC_PORT:=5901}"
@@ -14,17 +15,20 @@
 : "${CONTAINER_NAME:=ayab}"
 repo=$(cd "$(dirname "$0")/.." && pwd)
 
-image=ayab
-
-# Build the image (quick when nothing changed)
+# build_image TARGET: build one of docker/Dockerfile's images (quick when
+# nothing changed) and set $image to its tag, ayab-TARGET
 build_image() {
+    image=ayab-$1
     echo "Building $image image..."
     docker build --quiet --platform linux/amd64 \
         --file "$repo/docker/Dockerfile" \
-        --target runner \
+        --target "$1" \
         --tag "$image" \
         "$repo" >/dev/null
 }
+
+# Source runs keep their Python environments in this volume between runs
+venvs_volume=${VENVS_VOLUME:-ayab-venvs}
 
 container_running() {
     docker ps --quiet --filter "name=^$CONTAINER_NAME\$" | grep -q .
@@ -46,6 +50,12 @@ run_in_vnc() {
         --env DARK_MODE="${DARK_MODE:-0}" \
         "$@" >/dev/null
 
+    # Show the log from the start: the first source run spends a while
+    # setting up its Python environment
+    echo "Following logs; press Ctrl-C to stop the container."
+    trap 'docker stop "$CONTAINER_NAME" >/dev/null 2>&1; exit 0' INT TERM
+    docker logs --follow "$CONTAINER_NAME" 2>&1 | grep -vE 'x11vnc|^[0-9]{2}/[0-9]{2}/[0-9]{4} ' &
+
     # x11vnc prints its port once it accepts connections; websockify starts
     # right after it
     novnc_url="http://127.0.0.1:$NOVNC_PORT/vnc.html"
@@ -64,18 +74,13 @@ run_in_vnc() {
     until docker exec "$CONTAINER_NAME" sh -c \
             'xwininfo -root -tree -display "${DISPLAY:-:99}" | grep -q "\"AYAB"' 2>/dev/null; do
         if ! container_running; then
-            echo "Container exited before AYAB started:" >&2
-            docker logs "$CONTAINER_NAME" 2>&1 | tail -n 20 >&2 || true
+            echo "Container exited before AYAB started" >&2
             exit 1
         fi
         sleep 2
     done
 
     open_viewer
-
-    echo "Following logs; press Ctrl-C to stop the container."
-    trap 'docker stop "$CONTAINER_NAME" >/dev/null 2>&1; exit 0' INT TERM
-    docker logs --follow "$CONTAINER_NAME" 2>&1 | grep -vE 'x11vnc|^[0-9]{2}/[0-9]{2}/[0-9]{4} ' &
     wait
 }
 

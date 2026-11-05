@@ -10,6 +10,10 @@ set -eu
 : "${VNC_PASSWORD:=ayab}"
 export DISPLAY
 
+# A lock left in the image by a build-time X server would make Xvfb refuse to
+# start when its PID happens to be in use; in a fresh container it's stale.
+rm -f "/tmp/.X${DISPLAY#:}-lock"
+
 Xvfb "$DISPLAY" -screen 0 1440x900x24 -nolisten tcp &
 
 attempts=0

@@ -1,21 +1,32 @@
 #!/bin/bash
-# Entrypoint of the AYAB image: start the VNC display (see start-vnc-display),
+# Entrypoint of the AYAB images: start the VNC display (see start-vnc-display),
 # then run, depending on the first argument:
 #
-#   source-linux [args]   the checkout mounted at /workspace, with Linux Python
-#   source-wine [args]    the checkout mounted at /workspace, with Windows
-#                         Python under Wine
-#   path/to/*.AppImage    a Linux AppImage
-#   path/to/*.exe         a Windows program under Wine; an NSIS installer (an
-#                         AYAB release) is unpacked and AYAB.exe run from it
-#   anything else         run as is
+#   path/to/*.AppImage         a Linux AppImage (linux-release)
+#   path/to/*.exe              a Windows program under Wine; an NSIS installer
+#                              (an AYAB release) is unpacked and AYAB.exe run
+#                              from it (wine-release)
+#   source-linux [fbs args]    fbs (default: run) in the checkout mounted at
+#                              /workspace, with Linux Python (linux-source)
+#   source-wine [fbs args]     the same with Windows Python under Wine
+#                              (wine-source); e.g. "source-wine freeze"
+#   anything else              run as is
+#
+# Source runs keep their Python environment in /venvs (mount a volume there to
+# keep it between runs): it is created on first use and updated whenever the
+# checkout's requirements change. Python modules generated from the Qt .ui and
+# .qrc files are regenerated in the checkout when missing or out of date.
 #
 # Environment: DARK_MODE (default 0; 1 for dark mode), plus those of
 # start-vnc-display.
 set -eu
 
-export DISPLAY="${DISPLAY:-:99}"
-start-vnc-display
+venvs=/venvs
+
+die() {
+    echo "ayab-entrypoint: $*" >&2
+    exit 1
+}
 
 # Wine passes the environment on to Windows programs, so Linux-only Qt
 # settings are only set for Linux runs.
@@ -32,6 +43,7 @@ setup_linux_qt() {
 # the Windows dark-mode preference and use Fusion, the Qt style that follows
 # it (at the cost of no visible menu bar highlight when Alt is pressed).
 setup_wine() {
+    command -v wine >/dev/null || die "this image has no Wine; use a wine-* image"
     local light=1
     if [ "${DARK_MODE:-0}" = 1 ]; then
         light=0
@@ -41,29 +53,120 @@ setup_wine() {
         /v AppsUseLightTheme /t REG_DWORD /d "$light" /f >/dev/null
 }
 
-# Source runs need the Python modules generated from the Qt .ui and .qrc
-# files; generate them in the checkout if missing.
-cd_to_checkout() {
-    cd /workspace
-    if [ ! -f src/main/python/main/ayab/main_gui.py ]; then
-        echo "Generating Qt UI modules in the checkout..." >&2
-        grep -v -e genpyi -e submodule setup-environment.ps1 \
-            | PATH="/opt/venv/bin:$PATH" bash
-    fi
+# The checkout's requirements, with the git-pinned fbs replaced by the
+# equivalent GitHub source archive (Windows pip can't run the Linux git, and
+# this keeps git out of the images)
+write_requirements() {
+    sed -E \
+        's#^fbs @ git\+https://github.com/([^@]+)@([0-9a-f]+)$#fbs @ https://github.com/\1/archive/\2.zip#' \
+        requirements.build.txt > /tmp/requirements.txt
 }
+
+# env_is_current ENV FILE... : whether ENV was set up from these files
+env_is_current() {
+    local env=$1
+    shift
+    [ -f "$env/.requirements.sha256" ] \
+        && [ "$(cat "$@" | sha256sum)" = "$(cat "$env/.requirements.sha256")" ]
+}
+
+# mark_env_current ENV FILE...
+mark_env_current() {
+    local env=$1
+    shift
+    cat "$@" | sha256sum > "$env/.requirements.sha256"
+}
+
+setup_linux_env() {
+    local env=$venvs/linux
+    env_is_current "$env" requirements.build.txt && return
+    echo "Setting up the Linux Python environment in $env..." >&2
+    [ -x "$env/bin/python" ] || python3.11 -m venv "$env"
+    write_requirements
+    "$env/bin/python" -m pip install --cache-dir "$venvs/cache/linux" \
+        -r /tmp/requirements.txt
+    mark_env_current "$env" requirements.build.txt
+}
+
+# The Windows environment is a copy of the image's Windows Python (more
+# robust under Wine than a venv), with the requirements installed into it
+setup_wine_env() {
+    local env=$venvs/wine
+    local reqs=(requirements.build.txt windows-build/windows_build_requirements.txt)
+    env_is_current "$env" "${reqs[@]}" && return
+    [ -d /wine/drive_c/Python311 ] || die "this image has no Windows Python; use wine-source"
+    echo "Setting up the Windows Python environment in $env..." >&2
+    [ -f "$env/python.exe" ] || cp -a /wine/drive_c/Python311 "$env"
+    write_requirements
+    DISPLAY= wine "$(winepath -w "$env/python.exe")" -m pip install \
+        --cache-dir "$(winepath -w "$venvs/cache/wine")" \
+        -r "$(winepath -w /tmp/requirements.txt)" \
+        -r "$(winepath -w "${reqs[1]}")"
+    find "$env/Lib/site-packages" -iname qopensslbackend.dll -delete
+    # Modern Windows supplies UCRT API-set contracts as part of the OS. The
+    # pinned fbs fork predates that baseline and incorrectly requires an SDK
+    # copy on PATH.
+    sed -i \
+        "s/for ucrt_dll in ('api-ms-win-crt-multibyte-l1-1-0.dll',):/for ucrt_dll in ():/" \
+        "$env/Lib/site-packages/fbs/freeze/windows.py"
+    mark_env_current "$env" "${reqs[@]}"
+}
+
+# generate_qt_modules linux|wine : (re)generate the Python modules for the Qt
+# .ui and .qrc files that are missing or older than their source
+generate_qt_modules() {
+    local platform=$1 source output tool
+    find src/main/python \( -name '*_gui.ui' -o -name '*_rc.qrc' \) -print \
+        | while IFS= read -r source; do
+            output=${source%.*}.py
+            [ -f "$output" ] && [ ! "$source" -nt "$output" ] && continue
+            case $source in
+                *.ui) tool=pyside6-uic ;;
+                *) tool=pyside6-rcc ;;
+            esac
+            echo "Generating $output" >&2
+            if [ "$platform" = linux ]; then
+                "$venvs/linux/bin/$tool" "$source" -o "$output"
+            else
+                DISPLAY= wine "$(winepath -w "$venvs/wine/Scripts/$tool.exe")" \
+                    "$(winepath -w "$source")" -o "$(winepath -w "$output")"
+            fi
+            # As in setup-environment.ps1, for mypy
+            if [ "$tool" = pyside6-uic ]; then
+                perl -pi -e 's/^(.*def setupUi.*):$/\1->None:/s' "$output"
+            fi
+        done
+}
+
+# prepare_checkout linux|wine : set up the environment and generated modules
+prepare_checkout() {
+    cd /workspace 2>/dev/null && [ -f requirements.build.txt ] \
+        || die "mount an AYAB checkout at /workspace"
+    mkdir -p "$venvs"
+    # Serialize environment updates between containers sharing the volume
+    exec 9>"$venvs/.lock"
+    flock 9
+    if [ "$1" = linux ]; then setup_linux_env; else setup_wine_env; fi
+    generate_qt_modules "$1"
+    flock --unlock 9
+}
+
+export DISPLAY="${DISPLAY:-:99}"
+start-vnc-display
 
 case "${1:-}" in
     source-linux)
         shift
-        cd_to_checkout
+        command -v gcc >/dev/null || die "this image can't build the environment; use linux-source"
+        prepare_checkout linux
         setup_linux_qt
-        exec /opt/venv/bin/python -m fbs run "$@"
+        exec "$venvs/linux/bin/python" -m fbs "${@:-run}"
         ;;
     source-wine)
         shift
-        cd_to_checkout
         setup_wine
-        exec /usr/lib/wine/wine64 'C:\Python311\python.exe' -m fbs run "$@"
+        prepare_checkout wine
+        exec /usr/lib/wine/wine64 "$(winepath -w "$venvs/wine/python.exe")" -m fbs "${@:-run}"
         ;;
     *.AppImage)
         setup_linux_qt
@@ -89,13 +192,13 @@ case "${1:-}" in
             7z x -bd -o"$appdir" "$exe" >/dev/null
             rm -rf "$appdir/\$PLUGINSDIR"
             exe="$appdir/AYAB.exe"
-            if [ ! -f "$exe" ]; then
-                echo "AYAB.exe not found in the installer" >&2
-                exit 1
-            fi
+            [ -f "$exe" ] || die "AYAB.exe not found in the installer"
         fi
         cd "$(dirname "$exe")"
         exec /usr/lib/wine/wine64 "$(basename "$exe")" "$@"
+        ;;
+    "")
+        die "no command; see the header of $0"
         ;;
     *)
         exec "$@"
