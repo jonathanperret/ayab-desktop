@@ -388,3 +388,184 @@ jobs:
         with:
           name: AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
           path: AYAB-${{ steps.vars.outputs.tag }}-x86_64.AppImage
+
+  # The demo jobs install the packages built above and record videos of the
+  # app running through a demo script (see utils/record_demo.py and
+  # src/main/python/main/ayab/demo.py), in light and dark mode.
+  demo-windows:
+    name: Record Windows demo video
+    needs: build-windows
+    runs-on: windows-2022
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Download installer
+        uses: actions/download-artifact@v4
+        with:
+          pattern: AYAB-*.exe
+          merge-multiple: true
+          path: installer
+
+      - name: Install app
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem installer\AYAB-*.exe | Select-Object -First 1
+          Start-Process -FilePath $installer.FullName -ArgumentList '/S', '/D=C:\AYAB' -Wait
+          Get-ChildItem C:\AYAB\AYAB.exe
+
+      - name: Record demo video
+        shell: bash
+        run: |
+          python -m pip install imageio-ffmpeg pillow
+          mkdir -p demo
+          status=0
+          python utils/record_demo.py demo/demo-windows-light.mp4 'C:\AYAB\AYAB.exe' || status=$?
+          python utils/record_demo.py --dark demo/demo-windows-dark.mp4 'C:\AYAB\AYAB.exe' || status=$?
+          cp ~/AYAB/ayab_log.txt demo/ || true
+          exit $status
+
+      - name: Upload demo video
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-windows
+          path: demo/
+          if-no-files-found: ignore
+
+  demo-macos:
+    name: Record Mac OSX demo video
+    needs: build-macos
+    runs-on: macos-15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Download disk image
+        uses: actions/download-artifact@v4
+        with:
+          pattern: AYAB-*.dmg
+          merge-multiple: true
+          path: dmg
+
+      - name: Install app
+        run: |
+          mountpoint=$(mktemp -d)
+          hdiutil attach -nobrowse -readonly -mountpoint "$mountpoint" dmg/AYAB-*.dmg
+          app=$(find "$mountpoint" -maxdepth 1 -name '*.app' | head -1)
+          mkdir -p app
+          cp -R "$app" app/
+          hdiutil detach "$mountpoint"
+          app=$(find app -maxdepth 1 -name '*.app' | head -1)
+          exe="$app/Contents/MacOS/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")"
+          echo "AYAB_EXE=$PWD/$exe" >> "$GITHUB_ENV"
+
+      - name: Record demo video
+        run: |
+          python -m pip install imageio-ffmpeg pillow
+          mkdir -p demo
+          status=0
+          python utils/record_demo.py demo/demo-macos-light.mp4 "$AYAB_EXE" || status=$?
+          python utils/record_demo.py --dark demo/demo-macos-dark.mp4 "$AYAB_EXE" || status=$?
+          cp ~/AYAB/ayab_log.txt demo/ || true
+          # collect crash reports, if any
+          sleep 5
+          cp ~/Library/Logs/DiagnosticReports/AYAB* demo/ 2>/dev/null || true
+          exit $status
+
+      - name: Upload demo video
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-macos
+          path: demo/
+          if-no-files-found: ignore
+
+      # Check that the app starts with no stored preferences, as on a fresh
+      # install. This used to crash in QLocale.system() (PYSIDE-2639, fixed in
+      # PySide6 6.6.3) while computing the default language.
+      - name: Check first launch
+        continue-on-error: true
+        run: |
+          defaults delete com.ayab-knitting.ayab 2> /dev/null || true
+          rm -rf ~/AYAB
+          # The demo is cut short by its timeout, which makes it exit with
+          # code 1: anything else means the app did not run properly.
+          status=0
+          AYAB_DEMO=1 AYAB_DEMO_TIMEOUT=15 "$AYAB_EXE" > first-launch.log 2>&1 || status=$?
+          if [[ $status -ne 1 ]]; then
+            grep -v " DEBUG " first-launch.log | tail -20
+            echo "::warning::App failed on first launch (exit code $status)"
+            exit 1
+          fi
+
+  demo-appimage:
+    name: Record Linux demo video
+    needs: build-appimage
+    runs-on: ubuntu-22.04
+    env:
+      DISPLAY: ":99"
+      # FUSE may not be available on the runner
+      APPIMAGE_EXTRACT_AND_RUN: "1"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Download AppImage
+        uses: actions/download-artifact@v4
+        with:
+          pattern: AYAB-*-x86_64.AppImage
+          merge-multiple: true
+          path: appimage
+
+      - name: Start virtual display
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb fluxbox ffmpeg \
+            libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 \
+            libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 \
+            libxcb-xinerama0 libxcb-xkb1 libegl1 libgl1 libfontconfig1 libdbus-1-3 \
+            libgtk-3-0 libasound2 fonts-dejavu-core
+          Xvfb "$DISPLAY" -screen 0 1280x800x24 &
+          sleep 2
+          fluxbox > /dev/null 2>&1 &
+          sleep 2
+
+      - name: Record demo video
+        run: |
+          python -m pip install pillow
+          mkdir -p demo
+          appimage=$(ls appimage/AYAB-*-x86_64.AppImage | head -1)
+          chmod +x "$appimage"
+          status=0
+          python utils/record_demo.py demo/demo-linux-light.mp4 "./$appimage" || status=$?
+          python utils/record_demo.py --dark demo/demo-linux-dark.mp4 "./$appimage" || status=$?
+          cp ~/AYAB/ayab_log.txt demo/ || true
+          exit $status
+
+      - name: Upload demo video
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-linux
+          path: demo/
+          if-no-files-found: ignore
+
