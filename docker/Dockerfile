@@ -79,18 +79,23 @@ ENV WINEARCH=win64 \
     WINEDEBUG=-all \
     WINEDLLOVERRIDES=mscoree,mshtml=
 
-# 7zip unpacks release installers
-RUN dpkg --add-architecture i386 \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        wine wine32:i386 wine64 fonts-wine 7zip \
-    && rm -rf /var/lib/apt/lists/*
-
+# 64-bit Wine only: AYAB is a 64-bit program, and its 32-bit release installer
+# is unpacked with 7zip rather than run.
+#
+# wineboot copies every Wine DLL into the prefix; hardlinking the copies to
+# the originals, in the same layer, saves over a gigabyte.
+#
 # Remove the build-time X server's files, whose stale lock would otherwise
-# stop the display from starting in containers (see start-vnc-display)
-RUN xvfb-run -a sh -c \
+# stop the display from starting in containers (see start-vnc-display).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        wine wine64 fonts-wine 7zip \
+    && rm -rf /var/lib/apt/lists/* \
+    && xvfb-run -a sh -c \
         'wineboot --init \
         && wineserver -w' \
+    && hardlink --quiet --ignore-time --ignore-owner --ignore-mode \
+        /usr/lib/x86_64-linux-gnu/wine /wine \
     && rm -rf /tmp/.X*-lock /tmp/.X11-unix /tmp/wine-*
 
 FROM wine-release AS wine-source
