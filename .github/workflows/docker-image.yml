@@ -128,12 +128,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE }}
-          # Branch or tag name, commit SHA, and latest for the default branch
+          # Branch or tag name, commit SHA, and latest: every push updates
+          # latest, whatever the branch
           tags: |
             type=ref,event=branch
             type=ref,event=tag
             type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
       - name: Push
         if: github.event_name != 'pull_request'
