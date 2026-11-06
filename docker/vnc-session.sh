@@ -72,7 +72,7 @@ run_in_vnc() {
     # does not open on an empty black desktop
     echo "Waiting for the AYAB window..."
     until docker exec "$CONTAINER_NAME" sh -c \
-            'xwininfo -root -tree -display "${DISPLAY:-:99}" | grep -q "\"AYAB"' 2>/dev/null; do
+            'xwininfo -root -tree -display "${DISPLAY:-:99}" | grep -qE "\"(AYAB|All Yarns Are Beautiful)"' 2>/dev/null; do
         if ! container_running; then
             echo "Container exited before AYAB started" >&2
             exit 1

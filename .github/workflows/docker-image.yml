@@ -91,9 +91,9 @@ jobs:
           # Up to 20 minutes: source images first set up their environment
           for i in $(seq 600); do
             if docker exec ayab sh -c \
-                'xwininfo -root -tree | grep -q "\"AYAB"' 2>/dev/null; then
+                'xwininfo -root -tree | grep -qE "\"(AYAB|All Yarns Are Beautiful)"' 2>/dev/null; then
               sleep 5  # let the window finish drawing
-              docker exec ayab sh -c 'xwininfo -root -tree | grep "\"AYAB"'
+              docker exec ayab sh -c 'xwininfo -root -tree | grep -E "\"(AYAB|All Yarns Are Beautiful)"'
               docker exec ayab maim > screenshot.png
               docker logs ayab
               exit 0
