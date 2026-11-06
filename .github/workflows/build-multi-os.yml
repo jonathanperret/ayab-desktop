@@ -572,6 +572,9 @@ jobs:
   demo-montage:
     name: Combine demo videos
     needs: [demo-windows, demo-macos, demo-appimage]
+    # Combine whichever demos succeeded, so that a platform failing (or
+    # missing a runner) only leaves its row out.
+    if: ${{ !cancelled() && contains(needs.*.result, 'success') }}
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
@@ -583,11 +586,25 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Download demo videos
+      - name: Download Windows demo videos
+        if: needs.demo-windows.result == 'success'
         uses: actions/download-artifact@v4
         with:
-          pattern: demo-*
-          merge-multiple: true
+          name: demo-windows
+          path: demo
+
+      - name: Download macOS demo videos
+        if: needs.demo-macos.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-macos
+          path: demo
+
+      - name: Download Linux demo videos
+        if: needs.demo-appimage.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-linux
           path: demo
 
       - name: Combine demo videos
