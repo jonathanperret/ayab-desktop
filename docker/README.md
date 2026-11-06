@@ -64,7 +64,13 @@ of which contains AYAB code or dependencies:
 | `wine-source`   | Wine 10 and a plain Windows Python 3.11    | `source-wine [fbs command]`         |
 
 Source images run the checkout mounted at `/workspace` and keep their Python
-environment in `/venvs`. The shared entrypoint, `docker/image/ayab-entrypoint`,
+environment in `/venvs`.
+
+`linux-source` is published for linux/amd64 and linux/arm64, and
+`linux-build/run-source.sh` runs it natively, so without emulation on Apple
+Silicon. Each architecture has its own environment in `/venvs`
+(`linux-x86_64`, `linux-aarch64`). The other images run x86-64 programs and
+are linux/amd64 only. The shared entrypoint, `docker/image/ayab-entrypoint`,
 starts the display (`start-vnc-display`: Xvfb, Openbox, x11vnc on port 5900,
 and websockify serving noVNC on port 6080; noVNC is a pinned release
 installed by `docker/image/install-novnc`), then runs its argument.

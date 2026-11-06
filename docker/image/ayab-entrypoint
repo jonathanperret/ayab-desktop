@@ -22,6 +22,9 @@
 set -eu
 
 venvs=/venvs
+# One Linux environment per architecture, as amd64 and arm64 containers may
+# share the volume
+linux_env=$venvs/linux-$(uname -m)
 
 die() {
     echo "ayab-entrypoint: $*" >&2
@@ -78,7 +81,7 @@ mark_env_current() {
 }
 
 setup_linux_env() {
-    local env=$venvs/linux
+    local env=$linux_env
     env_is_current "$env" requirements.build.txt && return
     echo "Setting up the Linux Python environment in $env..." >&2
     [ -x "$env/bin/python" ] || python3.11 -m venv "$env"
@@ -126,7 +129,7 @@ generate_qt_modules() {
             esac
             echo "Generating $output" >&2
             if [ "$platform" = linux ]; then
-                "$venvs/linux/bin/$tool" "$source" -o "$output"
+                "$linux_env/bin/$tool" "$source" -o "$output"
             else
                 DISPLAY= wine "$(winepath -w "$venvs/wine/Scripts/$tool.exe")" \
                     "$(winepath -w "$source")" -o "$(winepath -w "$output")"
@@ -160,7 +163,7 @@ case "${1:-}" in
         command -v gcc >/dev/null || die "this image can't build the environment; use linux-source"
         prepare_checkout linux
         setup_linux_qt
-        exec "$venvs/linux/bin/python" -m fbs "${@:-run}"
+        exec "$linux_env/bin/python" -m fbs "${@:-run}"
         ;;
     source-wine)
         shift

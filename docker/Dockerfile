@@ -1,5 +1,4 @@
 # syntax=docker/dockerfile:1
-# check=skip=FromPlatformFlagConstDisallowed
 
 # Images that run AYAB on a virtual display served over VNC and noVNC; see
 # docker/README.md. They contain no AYAB code: release images run a given
@@ -18,7 +17,10 @@
 
 # Debian trixie provides Wine 10; the python:3.11 base provides the Python
 # version AYAB requires on Linux (unused by the release images).
-FROM --platform=linux/amd64 python:3.11-slim-trixie AS base
+#
+# linux-source is built for linux/amd64 and linux/arm64; the others, which run
+# x86-64 programs, for linux/amd64 only.
+FROM python:3.11-slim-trixie AS base
 
 # Audio expects a PulseAudio server on the host; on macOS:
 #     brew install pulseaudio
@@ -65,9 +67,11 @@ FROM base AS linux-release
 
 FROM base AS linux-source
 
-# To build the Python packages that have no wheel (simpleaudio)
+# To build the Python packages that have no wheel (simpleaudio); PySide6's
+# arm64 wheels before 6.8 expect the system's double-conversion library
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc libc6-dev libasound2-dev \
+        libdouble-conversion3 \
     && rm -rf /var/lib/apt/lists/*
 
 CMD ["source-linux"]

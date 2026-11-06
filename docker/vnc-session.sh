@@ -15,12 +15,18 @@
 : "${CONTAINER_NAME:=ayab}"
 repo=$(cd "$(dirname "$0")/.." && pwd)
 
-# build_image TARGET: build one of docker/Dockerfile's images (quick when
-# nothing changed) and set $image to its tag, ayab-TARGET
+# build_image TARGET [PLATFORM]: build one of docker/Dockerfile's images (quick
+# when nothing changed) for PLATFORM (default linux/amd64; "native" for the
+# host's) and set $image to its tag, ayab-TARGET
 build_image() {
     image=ayab-$1
+    case ${2:-linux/amd64} in
+        native) platform_args= ;;
+        *) platform_args="--platform ${2:-linux/amd64}" ;;
+    esac
     echo "Building $image image..."
-    docker build --quiet --platform linux/amd64 \
+    # shellcheck disable=SC2086
+    docker build --quiet $platform_args \
         --file "$repo/docker/Dockerfile" \
         --target "$1" \
         --tag "$image" \
@@ -42,7 +48,8 @@ run_in_vnc() {
     docker rm --force "$CONTAINER_NAME" >/dev/null 2>&1 || true
 
     echo "Starting $description in container $CONTAINER_NAME..."
-    docker run --detach --rm --platform linux/amd64 \
+    # shellcheck disable=SC2086
+    docker run --detach --rm $platform_args \
         --name "$CONTAINER_NAME" \
         --publish "127.0.0.1:$NOVNC_PORT:6080" \
         --publish "127.0.0.1:$VNC_PORT:5900" \

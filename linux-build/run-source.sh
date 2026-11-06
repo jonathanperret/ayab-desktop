@@ -8,7 +8,8 @@ set -eu
 
 . "$(dirname "$0")/../docker/vnc-session.sh"
 
-build_image linux-source
+# Native: arm64 on Apple Silicon, without emulation
+build_image linux-source native
 run_in_vnc "source checkout (Linux)" \
     --mount "type=bind,source=$repo,target=/workspace" \
     --mount "type=volume,source=$venvs_volume,target=/venvs" \
